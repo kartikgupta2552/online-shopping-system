@@ -1,0 +1,13 @@
+# Node Modules
+/frontend/node_modules/
+
+# Build files
+/frontend/dist/
+
+# Java Build files
+/backend/target/
+
+# IDE files
+*.idea/
+*.vscode/
+
