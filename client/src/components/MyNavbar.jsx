@@ -33,7 +33,7 @@ function MyNavbar() {
     return (
         <nav className="navbar navbar-expand-lg bg-body-tertiary">
             <div className="container-fluid">
-                <Link className="nav-link active" aria-current="page" to="/"><strong>Not-Another-Shop</strong></Link>
+                <Link className="nav-link active" aria-current="page" to="/homepage"><strong>Not-Another-Shop</strong></Link>
                 <button className="navbar-toggler" type="button" data-bs-toggle="collapse"
                         data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
                         aria-expanded="false" aria-label="Toggle navigation">
