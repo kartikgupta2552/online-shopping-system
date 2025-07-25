@@ -5,7 +5,7 @@ import Footer from "../components/Footer.jsx";
 import categories from "../Dummy Data/categories.js";
 
 import products from "../Dummy Data/products.js";
-import { useLocation } from "react-router-dom";
+import { useLocation ,useNavigate,Link} from "react-router-dom";
 
 
 
@@ -15,6 +15,7 @@ function HomePage() {
     // Pick your sausage: all or some categories
     const selectedCategories = categories.slice(0, 3);
     const location = useLocation();
+        const navigate = useNavigate();
     return (
         <>
             <MyNavbar/>

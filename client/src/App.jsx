@@ -5,6 +5,7 @@ import ItemDetailsPage from "./pages/ItemDetailsPage";
 import Payment from "./pages/Payment";
 import HomePage from "./pages/HomePage";
 import CategoryPage from "./pages/CategoryPage";
+import SearchResultsPage from "./pages/SearchResultsPage";
 
 const router = createBrowserRouter(
     [
@@ -13,7 +14,8 @@ const router = createBrowserRouter(
       {path: "/itemDetailsPage", element: <ItemDetailsPage />},
       {path: "/payment", element: <Payment />},
       {path: "/homepage", element: <HomePage/>},
-      {path: "/category/:name",element:<CategoryPage/>}
+      {path: "/category/:name",element:<CategoryPage/>},
+      {path: "/search", element:<SearchResultsPage/>}
     
     ]
   )
