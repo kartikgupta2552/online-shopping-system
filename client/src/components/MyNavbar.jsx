@@ -54,7 +54,7 @@ function MyNavbar() {
                                     <li key={cat.id}>
                                         <Link
                                             className="dropdown-item"
-                                            to={`/category/${encodeURIComponent(cat.name)}`}
+                                            to={`/category/${cat.name}`}
                                         >
                                             {cat.name}
                                         </Link>
