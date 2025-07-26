@@ -6,6 +6,7 @@ import Payment from "./pages/Payment";
 import HomePage from "./pages/HomePage";
 import CategoryPage from "./pages/CategoryPage";
 import SearchResultsPage from "./pages/SearchResultsPage";
+import './App.css';  
 
 const router = createBrowserRouter(
     [
