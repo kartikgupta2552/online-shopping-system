@@ -2,6 +2,7 @@ import React from 'react';
 import {useNavigate} from 'react-router-dom'
 import headphoneImg from '../assets/headphones.jpg';
 import Navbar from '../components/Navbar';
+import MyNavbar from '../components/MyNavbar';
 const ItemDetailsPage = () => {
 
   const navigate=useNavigate();
@@ -19,7 +20,8 @@ const ItemDetailsPage = () => {
     <>
       {/* Navbar */}
      
-      <Navbar/>
+      {/* <Navbar/> */}
+      <MyNavbar/>
 
       {/* Product Details */}
       <div className="container-fluid mb-5">

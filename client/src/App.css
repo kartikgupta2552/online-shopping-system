@@ -1,0 +1,19 @@
+.product-card {
+    width: 100%;               /* Responsive column sizing */
+    min-width: 250px;          /* Prevents cards from shrinking too much */
+    max-width: 300px;          /* All cards, max same size */
+    min-height: 430px;         /* All cards height identical (experiment as needed) */
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+}
+.product-card-img {
+    height: 180px;
+    object-fit: cover;         /* Crop/stretch images to fill area */
+}
+
+.product-card .card-body {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+}

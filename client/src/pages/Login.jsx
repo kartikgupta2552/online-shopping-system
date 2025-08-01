@@ -1,10 +1,11 @@
 import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import { Link,useNavigate } from "react-router-dom";
 
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
+      const navigate = useNavigate();
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -26,7 +27,8 @@ const Login = () => {
       setErrors(validationErrors);
     } else {
       setErrors({});
-      alert("Login Successful");
+      // alert("Login Successful");
+      navigate("/homepage", { state: { loginSuccess: true } });
     }
   };
 
