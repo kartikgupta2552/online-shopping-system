@@ -19,7 +19,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.apnacart.dto.request.UserLoginDto;
 import com.apnacart.dto.request.UserRegistrationDto;
 import com.apnacart.dto.request.UserUpdateDto;
-import com.apnacart.dto.response.ApiResponse;
+import com.apnacart.payload.ApiResponse;
 import com.apnacart.dto.response.UserResponseDto;
 import com.apnacart.entity.UserStatus;
 import com.apnacart.service.UserService;

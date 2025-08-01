@@ -10,7 +10,7 @@ import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
-import com.apnacart.dto.response.ApiResponse;
+import com.apnacart.payload.ApiResponse;
 
 @RestControllerAdvice 
 //marks this class as global exception handler for all controllers
