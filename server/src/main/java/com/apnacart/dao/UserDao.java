@@ -3,6 +3,8 @@ package com.apnacart.dao;
 import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.apnacart.entity.User;
@@ -17,6 +19,18 @@ public interface UserDao extends JpaRepository<User, Long> {
 	//find user by email(login functionality)
 	Optional<User> findByEmail(String email);
 	//optional used for safe null handling (for the user not found case)
+	
+	//find active user by email
+	@Query("select u from User u where u.email = :email and u.status = 'ACTIVE'")
+	Optional<User> findActiveUserByEmail(@Param("email") String email);
+	
+	//find active user by id
+	@Query("select u from User u where u.userId = :userId")
+	Optional<User> findActiveUserById(@Param("userId") Long userId);
+	
+	//find all active users
+	@Query("select u from User u where u.status='ACTIVE'")
+	List<User> findActiveUsers();
 	
 	//find user by phone no
 	Optional<User> findByMobileNo(String mobileNo);

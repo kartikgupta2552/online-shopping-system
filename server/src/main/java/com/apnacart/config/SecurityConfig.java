@@ -5,23 +5,44 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+
+import lombok.RequiredArgsConstructor;
 
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor // constructor injection via lombok (only final fields or @NonNull fields)
 public class SecurityConfig {
 	//CSRF - cross site request forgery
 	//CORS - cross origin 
+	
+	private final JwtAuthenticationFilter jwtAuthenticationFilter;
 	
 	//spring security blocks every request by default when needed
 	//using this we are temporarily allowing such requests(we are only using bcrypt for now)
 	@Bean
 	public SecurityFilterChain filterChain(HttpSecurity http) throws Exception{
 		http
-			.csrf(csrf -> csrf.disable()) //disable the csrf for the REST APIs
+			//disable csrf -> not required for stateless JWT apis
+			.csrf(csrf -> csrf.disable())
+			//configure session management(stateless for jwt)
+			.sessionManagement(session -> session
+					.sessionCreationPolicy(SessionCreationPolicy.STATELESS) //no server side sessions
+					) // all user info comes from token not from server memory
+					// no session storage means easy horizontal scaling
+			//confifure endpoint authorization rules
 			.authorizeHttpRequests(auth -> auth
-					.anyRequest().permitAll()//allows all requests for now
-					);
+					// public endpoints(no authentication required)
+					.requestMatchers("/api/users/register", "/api/users/login").permitAll() //login and registration
+					.requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll() // swagger documentation
+					.requestMatchers("/error").permitAll() // error pages
+					// every other endpoints will be protected -> JWT authentication required
+					.anyRequest().authenticated()
+					)
+			// add our JWT filter BEFORE the default username/password filter
+			.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 		
 		return http.build();
 	}

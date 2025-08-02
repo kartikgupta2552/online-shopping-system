@@ -11,6 +11,7 @@ public enum UserStatus {
 	
 	/*
 	  	User clicked “Deactivate Account”
+	  	soft delete account
 		Can be reactivated by user request
 		Temporary suspension
 	 */

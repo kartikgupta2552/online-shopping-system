@@ -19,9 +19,10 @@ import org.springframework.web.bind.annotation.RestController;
 import com.apnacart.dto.request.UserLoginDto;
 import com.apnacart.dto.request.UserRegistrationDto;
 import com.apnacart.dto.request.UserUpdateDto;
-import com.apnacart.payload.ApiResponse;
+import com.apnacart.dto.response.AuthenticationResponseDto;
 import com.apnacart.dto.response.UserResponseDto;
 import com.apnacart.entity.UserStatus;
+import com.apnacart.payload.ApiResponse;
 import com.apnacart.service.UserService;
 
 import io.swagger.v3.oas.annotations.Operation;
@@ -154,7 +155,7 @@ public class UserController {
 	//get all users
 	@GetMapping("/all")
 	public ResponseEntity<ApiResponse<List<UserResponseDto>>> getAllUsers(){
-		List<UserResponseDto> users = userService.getAllUserResponses();
+		List<UserResponseDto> users = userService.getAllActiveUsers();
 		ApiResponse<List<UserResponseDto>> response = ApiResponse.success("Users retrieved successfully", users);
 		return ResponseEntity.ok(response);
 	}//getAllUsersClean() ends
@@ -222,9 +223,9 @@ public class UserController {
 	    })
 	//login authentication
 	@PostMapping("/login")
-	public ResponseEntity<ApiResponse<UserResponseDto>> loginUser(@Valid @RequestBody UserLoginDto loginDto){
-			UserResponseDto user = userService.authenticateUser(loginDto);
-			ApiResponse<UserResponseDto> response = ApiResponse.success("Login Successful!", user);
+	public ResponseEntity<ApiResponse<AuthenticationResponseDto>> loginUser(@Valid @RequestBody UserLoginDto loginDto){
+			AuthenticationResponseDto user = userService.authenticateUser(loginDto);
+			ApiResponse<AuthenticationResponseDto> response = ApiResponse.success("User authenticated successfully!", user);
 			return ResponseEntity.ok(response);
 	}//loginUser() ends
 	
@@ -235,7 +236,7 @@ public class UserController {
 			)
 	@GetMapping("/{userId}/profile")
 	public ResponseEntity<ApiResponse<UserResponseDto>> getUserProfile(@PathVariable Long userId){
-		UserResponseDto user = userService.getUserResponseById(userId);
+		UserResponseDto user = userService.getActiveUserById(userId);
 		ApiResponse<UserResponseDto> response = ApiResponse.success("User retrieved successfully", user);
 		return ResponseEntity.ok(response);
 	}//getUserProfile() ends
@@ -274,7 +275,7 @@ public class UserController {
 			)
 	@DeleteMapping("/{userId}")
 	public ResponseEntity<ApiResponse<String>> deleteUser(@PathVariable Long userId){
-		userService.deleteUser(userId);
+		userService.softDeleteUser(userId);
 		ApiResponse<String> response = ApiResponse.success("User deleted succesfully", null);
 		return ResponseEntity.ok(response);
 	}//deleteUser() ends
