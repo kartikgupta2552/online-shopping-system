@@ -13,5 +13,13 @@ public class ApiResponse<T> {
     private String message;
     private T data;
     private Object error;
+
+    public static <T> ApiResponse<T> success(String message, T data){
+        return new ApiResponse<>(true, message, data, null);
+    }
+
+    public static <T> ApiResponse<T> error(String message, Object errorDetails){
+        return new ApiResponse<>(false, message, null, errorDetails);
+    }
     
 }

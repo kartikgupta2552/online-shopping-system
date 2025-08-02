@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.apnacart.dto.request.SubCategoryRequestDto;
 import com.apnacart.dto.response.SubCategoryResponseDto;
+import com.apnacart.payload.ApiResponse;
 import com.apnacart.service.SubCategoryService;
 
 import jakarta.validation.Valid;
@@ -23,43 +24,46 @@ import jakarta.validation.Valid;
 @RestController
 @RequestMapping("/subcategory")
 public class SubCategoryController {
-	
+
 	@Autowired
 	private SubCategoryService subCategoryService;
-	
+
 	// Add SubCategory
 	@PostMapping
-	public ResponseEntity<?> addSubCategory(@RequestBody @Valid SubCategoryRequestDto subCategoryRequestDto){
+	public ResponseEntity<ApiResponse<SubCategoryResponseDto>> addSubCategory(
+			@RequestBody @Valid SubCategoryRequestDto subCategoryRequestDto) {
 		SubCategoryResponseDto createdSubCategory = subCategoryService.createSubCategory(subCategoryRequestDto);
-		return ResponseEntity.status(HttpStatus.CREATED).body(createdSubCategory); // 201 Created
+		return ResponseEntity.status(HttpStatus.CREATED)
+				.body(ApiResponse.success("Subcategory Added Successfully", createdSubCategory)); // 201 Created
 	}
-	
+
 	// Get By Id
 	@GetMapping("/{id}")
-	public ResponseEntity<?> getSubCategoryById(@PathVariable("id") Long id){
+	public ResponseEntity<ApiResponse<SubCategoryResponseDto>> getSubCategoryById(@PathVariable("id") Long id) {
 		SubCategoryResponseDto subCategoryDto = subCategoryService.getSubCategoryById(id);
-		return ResponseEntity.ok(subCategoryDto); // 200 OK
+		return ResponseEntity.ok(ApiResponse.success("Subcategory fetched Successfully", subCategoryDto)); // 200 OK
 	}
-	
+
 	// Get All SubCategories
 	@GetMapping
-	public ResponseEntity<?> getAllSubCategories(){
+	public ResponseEntity<ApiResponse<List<SubCategoryResponseDto>>> getAllSubCategories() {
 		List<SubCategoryResponseDto> subCategories = subCategoryService.getAllSubCategories();
-		return ResponseEntity.ok(subCategories);
+		return ResponseEntity.ok(ApiResponse.success("All subcategories fetched successfully", subCategories));
 	}
-	
+
 	// Update SubCategory
 	@PutMapping("/{id}")
-	public ResponseEntity<?> updateSubCategory(@PathVariable("id") Long id, @RequestBody @Valid SubCategoryRequestDto subCategoryDto){
+	public ResponseEntity<ApiResponse<SubCategoryResponseDto>> updateSubCategory(@PathVariable("id") Long id,
+			@RequestBody @Valid SubCategoryRequestDto subCategoryDto) {
 		SubCategoryResponseDto subCategoryResponseDto = subCategoryService.updateSubCategory(id, subCategoryDto);
-		return ResponseEntity.ok(subCategoryResponseDto);
+		return ResponseEntity.ok(ApiResponse.success("Subcategory updated successfully", subCategoryResponseDto));
 	}
-	
+
 	// Delete SubCategory
 	@DeleteMapping("/{id}")
-	public ResponseEntity<?> deleteSubCategory(@PathVariable("id") Long id) {
+	public ResponseEntity<ApiResponse<Void>> deleteSubCategory(@PathVariable("id") Long id) {
 		subCategoryService.deleteSubCategory(id);
-		return ResponseEntity.ok("Subcategory deleted successfully.");
+		return ResponseEntity.ok(ApiResponse.success("Subcategory deleted successfully.", null));
 	}
 
 }

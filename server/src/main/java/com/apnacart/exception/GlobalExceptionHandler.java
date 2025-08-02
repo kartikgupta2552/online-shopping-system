@@ -16,23 +16,20 @@ public class GlobalExceptionHandler {
 
     // Handles validation errors like @NotBlank
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ApiResponse<Object>> handleValidationErrors(MethodArgumentNotValidException ex) {
+    public ResponseEntity<ApiResponse<Void>> handleValidationErrors(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
 
         ex.getBindingResult().getFieldErrors().forEach(
                 (e) -> errors.put(e.getField(), e.getDefaultMessage()));
-
-        ApiResponse<Object> apiResponse = new ApiResponse<>(false, "Validation failed", null, errors);
-
-        return new ResponseEntity<>(apiResponse, HttpStatus.BAD_REQUEST);
+        
+        return new ResponseEntity<>(ApiResponse.<Void>error("Validation failed",errors), HttpStatus.BAD_REQUEST);
     }
 
     // Handles any custom or unknown error (uncheck exceptions)
     @ExceptionHandler(RuntimeException.class)
-    public ResponseEntity<ApiResponse<Object>> handleRuntimeException(RuntimeException ex){
-        ApiResponse<Object> apiResponse = new ApiResponse<>(false,ex.getMessage(),null,null);
-
-        return new ResponseEntity<>(apiResponse, HttpStatus.INTERNAL_SERVER_ERROR);
+    public ResponseEntity<ApiResponse<Void>> handleRuntimeException(RuntimeException ex){
+        
+        return new ResponseEntity<>(ApiResponse.<Void>error(ex.getMessage(),null), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 }
