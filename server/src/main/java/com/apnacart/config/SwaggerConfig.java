@@ -22,7 +22,7 @@ public class SwaggerConfig {
 						.description("REST API for ApnaCart - an online shopping platform built using spring boot")
 						.version("1.0.0")
 						.contact(new Contact()
-								.name("Tushar Kartik Akanksha")
+								.name("Tushar Kartik Akanksha : github - ")
 								.url("https://github.com/kartikgupta2552/online-shopping-system-BE"))
 						)
 				.servers(List.of(
