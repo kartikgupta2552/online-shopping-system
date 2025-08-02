@@ -1,4 +1,4 @@
-package com.apnacart.dto.response;
+package com.apnacart.payload;
 
 import lombok.AllArgsConstructor;
 import lombok.Data;
