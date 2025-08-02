@@ -1,6 +1,8 @@
 package com.apnacart.entity;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -45,6 +47,9 @@ public class User {
 	
 	@UpdateTimestamp
 	private LocalDateTime updatedAt;
+
+	@OneToMany(mappedBy = "user", cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<Order> orders = new ArrayList<>();
 	
 	public boolean isActive() {
 		return this.status == UserStatus.ACTIVE;
