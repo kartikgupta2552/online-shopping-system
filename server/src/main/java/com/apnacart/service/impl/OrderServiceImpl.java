@@ -5,6 +5,7 @@ import com.apnacart.dao.UserDao;
 import com.apnacart.dto.request.OrderRequestDto;
 import com.apnacart.dto.response.OrderResponseDto;
 import com.apnacart.entity.Order;
+import com.apnacart.entity.OrderStatus;
 import com.apnacart.entity.User;
 import com.apnacart.exception.UserNotFoundException;
 import com.apnacart.service.OrderService;
@@ -56,11 +57,16 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public void deleteOrder(Long orderId) {
-
-    }
+    }//deleteOrder() ends
 
     @Override
     public boolean softDeleteOrder(Long orderId) {
-        return false;
+        Order order = orderDao.findById(orderId)
+                .orElseThrow(()-> new RuntimeException("No such order found!"));
+        if(order.getStatus() == OrderStatus.CANCELLED)
+            throw new RuntimeException("The order with id " + orderId + " is already cancelled!");
+        order.setStatus(OrderStatus.CANCELLED);
+        orderDao.save(order);
+        return true;
     }
 }//OrderServiceImpl ends

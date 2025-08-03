@@ -40,4 +40,11 @@ public class OrderController {
         return ResponseEntity.ok(response);
     }//getAllOrders() ends
 
+    @DeleteMapping("{orderId}")
+    public ResponseEntity<ApiResponse<String>> cancelOrder(@PathVariable Long orderId){
+        orderService.softDeleteOrder(orderId);
+        ApiResponse<String> response = ApiResponse.success("Order cancelled successfully!",null);
+        return ResponseEntity.ok(response);
+    }//cancelOrder() ends
+
 }//OrderController class ends
