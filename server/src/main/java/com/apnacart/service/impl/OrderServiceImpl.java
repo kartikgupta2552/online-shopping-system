@@ -42,22 +42,16 @@ public class OrderServiceImpl implements OrderService {
         return orderMapper.toOrderResponseDto(order);
     }//getOrderById() ends
 
-    @Override
-    public List<OrderResponseDto> getAllOrders() {
-        return orderDao.findAll()
-                .stream()
-                .map(orderMapper::toOrderResponseDto)
-                .toList();
-    }//getAllOrders() ends
 
     @Override
     public OrderResponseDto updateOrder(Long orderId, OrderRequestDto orderRequestDto) {
         return null;
-    }
+    }//updateOrder() ends
 
     @Override
-    public void deleteOrder(Long orderId) {
-    }//deleteOrder() ends
+    public List<OrderResponseDto> viewOrdersByUserId(Long userId) {
+        return List.of();
+    }//viewOrdersByUserId() ends
 
     @Override
     public boolean softDeleteOrder(Long orderId) {
@@ -68,5 +62,35 @@ public class OrderServiceImpl implements OrderService {
         order.setStatus(OrderStatus.CANCELLED);
         orderDao.save(order);
         return true;
-    }
+    }//softDeleteOrder() ends
+
+    //==================================================================================================================
+    //-----------admin functionality---------------
+
+    @Override
+    public OrderResponseDto changeOrderStatus(Long orderId, OrderStatus status) {
+        Order order = orderDao.findById(orderId)
+                .orElseThrow(()-> new RuntimeException("No such order exists!"));
+        order.setStatus(status);
+        orderDao.save(order);
+        return orderMapper.toOrderResponseDto(order);
+    }//changeOrderStatus() ends
+
+    //permanently deletes order
+    @Override
+    public void deleteOrder(Long orderId) {
+        if(!orderDao.existsById(orderId))
+            throw new RuntimeException("No such order exists!");
+        orderDao.deleteById(orderId);
+    }//deleteOrder() ends
+
+    @Override
+    public List<OrderResponseDto> getAllOrders() {
+        return orderDao.findAll()
+                .stream()
+                .map(orderMapper::toOrderResponseDto)
+                .toList();
+    }//getAllOrders() ends
+
+
 }//OrderServiceImpl ends

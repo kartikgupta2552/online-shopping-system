@@ -2,6 +2,7 @@ package com.apnacart.controller;
 
 import com.apnacart.dto.request.OrderRequestDto;
 import com.apnacart.dto.response.OrderResponseDto;
+import com.apnacart.entity.OrderStatus;
 import com.apnacart.payload.ApiResponse;
 import com.apnacart.service.OrderService;
 import jakarta.validation.Valid;
@@ -46,5 +47,15 @@ public class OrderController {
         ApiResponse<String> response = ApiResponse.success("Order cancelled successfully!",null);
         return ResponseEntity.ok(response);
     }//cancelOrder() ends
+
+    @PatchMapping("/{orderId}/status")
+    public ResponseEntity<ApiResponse<OrderResponseDto>> changeOrderStatus(
+            @PathVariable Long orderId,
+            @RequestParam OrderStatus status
+            ){
+        OrderResponseDto order = orderService.changeOrderStatus(orderId,status);
+        ApiResponse<OrderResponseDto> response = ApiResponse.success("Status changed to " + status + "successfully!",order);
+        return ResponseEntity.ok(response);
+    }//changeOrderStatus() ends
 
 }//OrderController class ends

@@ -14,7 +14,6 @@ import com.apnacart.dto.request.UserUpdateDto;
 import com.apnacart.dto.response.AuthenticationResponseDto;
 import com.apnacart.dto.response.UserResponseDto;
 import com.apnacart.entity.User;
-import com.apnacart.entity.UserRole;
 import com.apnacart.entity.UserStatus;
 import com.apnacart.exception.AccountInactiveException;
 import com.apnacart.exception.InvalidCredentialsException;
@@ -218,18 +217,16 @@ public class UserServiceImpl implements UserService {
 	}//authenticateUser() ends
 
 	@Override
-	public boolean softDeleteUser(Long userId) {
+	public void softDeleteUser(Long userId) {
 		User user = userDao.findById(userId)
 				.orElseThrow( () -> new UserNotFoundException("no such user found"));
 		user.setStatus(UserStatus.INACTIVE);
 		
 		userDao.save(user);
-		
-		return true;
 	}//softDeleteUser() ends
 
 	@Override
-	public boolean reactivateUser(Long userId) {
+	public void reactivateUser(Long userId) {
 		User user = userDao.findById(userId)
 				.orElseThrow(()-> new UserNotFoundException("No such user found!"));
 		
@@ -238,7 +235,6 @@ public class UserServiceImpl implements UserService {
 		}
 		user.setStatus(UserStatus.ACTIVE);
 		userDao.save(user);
-		return true;
 	}//reactivateUser() ends
 	
 }//UserServiceImpl ends

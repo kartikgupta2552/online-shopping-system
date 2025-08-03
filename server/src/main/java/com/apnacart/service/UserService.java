@@ -24,7 +24,7 @@ public interface UserService {
 	UserResponseDto changeUserStatus(Long userId, UserStatus status); //admin functionality
 	List<UserResponseDto> getUsersByStatus(UserStatus status); //admin functionality
 	void deleteUser(Long userId);
-	boolean softDeleteUser(Long userId);
-	boolean reactivateUser(Long userId);
+	void softDeleteUser(Long userId);
+	void reactivateUser(Long userId);
 	
 }//UserService interface ends
