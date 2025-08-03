@@ -78,6 +78,14 @@ const Payment = () => {
           <h3 className="text-muted">Select a payment method to enter details.</h3>
         )}
       </div>
+      
+
+       <div className="d-flex justify-content-center mt-4">
+      <button className="btn btn-success text-center">
+        Click for Payment
+      </button>
+    </div>
+
     </div>
   );
 };

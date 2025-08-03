@@ -43,8 +43,11 @@ public class User {
 	@Column(updatable = false) //can't modify it any further once created
 	private LocalDateTime createdAt;
 	
-	
 	@UpdateTimestamp
 	private LocalDateTime updatedAt;
+	
+	public boolean isActive() {
+		return this.status == UserStatus.ACTIVE;
+	}//isActive() ends
 	
 }//User class ends
