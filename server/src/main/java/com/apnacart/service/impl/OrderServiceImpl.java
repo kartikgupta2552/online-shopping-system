@@ -43,8 +43,11 @@ public class OrderServiceImpl implements OrderService {
 
     @Override
     public List<OrderResponseDto> getAllOrders() {
-        return List.of();
-    }
+        return orderDao.findAll()
+                .stream()
+                .map(orderMapper::toOrderResponseDto)
+                .toList();
+    }//getAllOrders() ends
 
     @Override
     public OrderResponseDto updateOrder(Long orderId, OrderRequestDto orderRequestDto) {

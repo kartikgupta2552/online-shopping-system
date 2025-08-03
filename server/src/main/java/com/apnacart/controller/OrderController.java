@@ -10,6 +10,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
+
 @RestController
 @RequestMapping("/api/orders")
 @CrossOrigin(origins = "http://localhost:3000")//for react frontend
@@ -30,5 +32,12 @@ public class OrderController {
         ApiResponse<OrderResponseDto> response = ApiResponse.success("Order retrieved successfully",order);
         return ResponseEntity.ok(response);
     }//getOrderById() ends
+
+    @GetMapping("/all")
+    public ResponseEntity<ApiResponse<List<OrderResponseDto>>> getAllOrders(){
+        List<OrderResponseDto> orders = orderService.getAllOrders();
+        ApiResponse<List<OrderResponseDto>> response = ApiResponse.success("All orders retrieved successfully",orders);
+        return ResponseEntity.ok(response);
+    }//getAllOrders() ends
 
 }//OrderController class ends
