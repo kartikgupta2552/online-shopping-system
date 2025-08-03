@@ -51,8 +51,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 		try {
 			// 5. validate token and extract user information
 			String email = jwtUtil.getEmailFromToken(jwtToken);
-			Long userId = jwtUtil.getUserIdFromToken(jwtToken);
-			String userRole = jwtUtil.getUserRoleFromToken(jwtToken);
+			// Long userId = jwtUtil.getUserIdFromToken(jwtToken);
+			// String userRole = jwtUtil.getUserRoleFromToken(jwtToken);
 			String userStatus = jwtUtil.getUserStatusFromToken(jwtToken);
 			
 			// 6. check if user is still active(security)

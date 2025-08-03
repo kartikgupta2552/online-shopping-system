@@ -14,7 +14,6 @@ import com.apnacart.dto.request.UserUpdateDto;
 import com.apnacart.dto.response.AuthenticationResponseDto;
 import com.apnacart.dto.response.UserResponseDto;
 import com.apnacart.entity.User;
-import com.apnacart.entity.UserRole;
 import com.apnacart.entity.UserStatus;
 import com.apnacart.exception.AccountInactiveException;
 import com.apnacart.exception.InvalidCredentialsException;

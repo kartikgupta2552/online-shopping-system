@@ -1,8 +1,5 @@
 package com.apnacart.dto.response;
 
-import com.apnacart.entity.UserRole;
-import com.apnacart.entity.UserStatus;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
