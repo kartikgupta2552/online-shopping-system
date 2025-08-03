@@ -2,7 +2,6 @@ package com.apnacart.controller;
 
 import java.util.List;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -20,13 +19,14 @@ import com.apnacart.payload.ApiResponse;
 import com.apnacart.service.SubCategoryService;
 
 import jakarta.validation.Valid;
+import lombok.RequiredArgsConstructor;
 
 @RestController
+@RequiredArgsConstructor
 @RequestMapping("/subcategory")
 public class SubCategoryController {
 
-	@Autowired
-	private SubCategoryService subCategoryService;
+	private final SubCategoryService subCategoryService;
 
 	// Add SubCategory
 	@PostMapping

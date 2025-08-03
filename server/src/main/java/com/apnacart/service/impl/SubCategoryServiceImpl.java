@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.modelmapper.ModelMapper;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.apnacart.dao.CategoryDao;
@@ -13,24 +12,29 @@ import com.apnacart.dto.request.SubCategoryRequestDto;
 import com.apnacart.dto.response.SubCategoryResponseDto;
 import com.apnacart.entity.Category;
 import com.apnacart.entity.SubCategory;
+import com.apnacart.exception.ResourceAlreadyExistsException;
+import com.apnacart.exception.ResourceNotFoundException;
 import com.apnacart.service.SubCategoryService;
 
+import lombok.RequiredArgsConstructor;
+
 @Service
+@RequiredArgsConstructor
 public class SubCategoryServiceImpl implements SubCategoryService {
 
-	@Autowired
-	private ModelMapper modelMapper;
-
-	@Autowired
-	private CategoryDao categoryDao;
-
-	@Autowired
-	private SubCategoryDao subCategoryDao;
+	private final ModelMapper modelMapper;
+	private final CategoryDao categoryDao;
+	private final SubCategoryDao subCategoryDao;
 
 	@Override
 	public SubCategoryResponseDto createSubCategory(SubCategoryRequestDto subCategoryDto) {
 		
-		Category category = categoryDao.findById(subCategoryDto.getCategoryId()).orElseThrow(() -> new RuntimeException("Category not found"));
+		Category category = categoryDao.findById(subCategoryDto.getCategoryId()).orElseThrow(() -> new ResourceNotFoundException("Category not found with ID: " + subCategoryDto.getCategoryId()));
+
+		if(subCategoryDao.existsBySubCategoryName(subCategoryDto.getSubCategoryName())){
+			throw new ResourceAlreadyExistsException("Subcategory already exist with name: "+ subCategoryDto.getSubCategoryName());
+		}
+
 		SubCategory subCategory = modelMapper.map(subCategoryDto, SubCategory.class);
 		subCategory.setCategory(category);
 		SubCategory createdSubCategory = subCategoryDao.save(subCategory);
@@ -43,7 +47,7 @@ public class SubCategoryServiceImpl implements SubCategoryService {
 	@Override
 	public SubCategoryResponseDto getSubCategoryById(Long id) {
 		
-		SubCategory subCategory = subCategoryDao.findById(id).orElseThrow(() -> new RuntimeException("Subcategory not found")); 
+		SubCategory subCategory = subCategoryDao.findById(id).orElseThrow(() -> new ResourceNotFoundException("Subcategory not found with ID: " + id)); 
 		SubCategoryResponseDto subCategoryResponseDto = modelMapper.map(subCategory, SubCategoryResponseDto.class);
 		subCategoryResponseDto.setCategoryId(subCategory.getCategory().getCategoryId());
 		
@@ -67,8 +71,15 @@ public class SubCategoryServiceImpl implements SubCategoryService {
 	@Override
 	public SubCategoryResponseDto updateSubCategory(Long id, SubCategoryRequestDto subCategoryDto) {
 		
-		Category category = categoryDao.findById(subCategoryDto.getCategoryId()).orElseThrow(() -> new RuntimeException("Category not found"));
-		SubCategory subCategory = subCategoryDao.findById(id).orElseThrow(() -> new RuntimeException("Subcategory not found"));
+		Category category = categoryDao.findById(subCategoryDto.getCategoryId()).orElseThrow(() -> new ResourceNotFoundException("Category not found with ID: " + subCategoryDto.getCategoryId()));
+		SubCategory subCategory = subCategoryDao.findById(id).orElseThrow(() -> new ResourceNotFoundException("Subcategory not found with ID: " + id));
+		
+		subCategoryDao.findBySubCategoryName(subCategoryDto.getSubCategoryName()).ifPresent(existingSubCategory -> {
+			if(!existingSubCategory.getSubCategoryId().equals(id)){
+				throw new ResourceAlreadyExistsException("Subcategory with name '"+subCategoryDto.getSubCategoryName()+"' already exists.");
+			}
+		});
+
 		subCategory.setSubCategoryName(subCategoryDto.getSubCategoryName());
 		subCategory.setCategory(category);
 		SubCategory updatedSubCategory = subCategoryDao.save(subCategory);
@@ -80,9 +91,10 @@ public class SubCategoryServiceImpl implements SubCategoryService {
 
 	@Override
 	public void deleteSubCategory(Long id) {
-		
+		if(!subCategoryDao.existsById(id)){
+			throw new ResourceNotFoundException("Subcategory not found with ID: " + id);
+		}
 		subCategoryDao.deleteById(id);
-		
 	}
 
 }

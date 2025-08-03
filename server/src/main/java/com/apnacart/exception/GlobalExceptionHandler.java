@@ -25,6 +25,19 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(ApiResponse.<Void>error("Validation failed",errors), HttpStatus.BAD_REQUEST);
     }
 
+    // Handles if Resource Not Found
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ApiResponse<Void>> handleResourceNotFound(ResourceNotFoundException ex){
+        
+        return new ResponseEntity<>(ApiResponse.<Void>error(ex.getMessage(),null), HttpStatus.NOT_FOUND);
+    }
+
+    // Handles if inserting duplicate data
+    public ResponseEntity<ApiResponse<Void>> handleResourceAlreadyExists(ResourceAlreadyExistsException ex){
+        
+        return new ResponseEntity<>(ApiResponse.<Void>error(ex.getMessage(), null) , HttpStatus.CONFLICT); // 409
+    }
+
     // Handles any custom or unknown error (uncheck exceptions)
     @ExceptionHandler(RuntimeException.class)
     public ResponseEntity<ApiResponse<Void>> handleRuntimeException(RuntimeException ex){
