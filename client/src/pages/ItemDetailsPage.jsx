@@ -10,7 +10,7 @@ const ItemDetailsPage = () => {
     navigate('/cart')
   }
   function handleClickWishList(){
-    navigate('/wishList')
+    navigate('/cart')
   }
   function handleClickPayment(){
     navigate('/payment')
@@ -20,7 +20,7 @@ const ItemDetailsPage = () => {
     <>
       {/* Navbar */}
      
-      {/* <Navbar/> */}
+     
       <MyNavbar/>
 
       {/* Product Details */}
