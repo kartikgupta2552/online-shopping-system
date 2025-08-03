@@ -279,6 +279,7 @@ public class UserController {
 		ApiResponse<String> response = ApiResponse.success("User deleted succesfully", null);
 		return ResponseEntity.ok(response);
 	}//deleteUser() ends
+
 	
 	
 }//UserController class ends

@@ -54,15 +54,16 @@ public class OrderServiceImpl implements OrderService {
     }//viewOrdersByUserId() ends
 
     @Override
-    public boolean softDeleteOrder(Long orderId) {
+    public void cancelOrder(Long orderId) {
         Order order = orderDao.findById(orderId)
                 .orElseThrow(()-> new RuntimeException("No such order found!"));
         if(order.getStatus() == OrderStatus.CANCELLED)
             throw new RuntimeException("The order with id " + orderId + " is already cancelled!");
         order.setStatus(OrderStatus.CANCELLED);
         orderDao.save(order);
-        return true;
     }//softDeleteOrder() ends
+
+
 
     //==================================================================================================================
     //-----------admin functionality---------------

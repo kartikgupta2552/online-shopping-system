@@ -22,9 +22,9 @@ public interface OrderService {
     OrderResponseDto getOrderById(Long orderId);
     List<OrderResponseDto> getAllOrders();
     OrderResponseDto updateOrder(Long orderId, OrderRequestDto orderRequestDto);
-    boolean softDeleteOrder(Long orderId);
+    void cancelOrder(Long orderId);
 
-    //admin functionalitu
+    //admin functionality
     void deleteOrder(Long orderId);
     OrderResponseDto changeOrderStatus(Long orderId, OrderStatus status);
     List<OrderResponseDto> viewOrdersByUserId(Long userId);

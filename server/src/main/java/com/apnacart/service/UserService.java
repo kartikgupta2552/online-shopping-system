@@ -19,12 +19,14 @@ public interface UserService {
 	UserResponseDto registerUser(UserRegistrationDto registrationDto);
 	UserResponseDto updateUser(Long userId, UserUpdateDto updateDto);
 	UserResponseDto getActiveUserById(Long userId);  //get user by id
-	List<UserResponseDto> getAllActiveUsers(); //get all users
 	AuthenticationResponseDto authenticateUser(UserLoginDto loginDto); //user login - get user by email and password
-	UserResponseDto changeUserStatus(Long userId, UserStatus status); //admin functionality
-	List<UserResponseDto> getUsersByStatus(UserStatus status); //admin functionality
-	void deleteUser(Long userId);
 	void softDeleteUser(Long userId);
+
+	//admin functionalities
 	void reactivateUser(Long userId);
-	
+	void deleteUser(Long userId);
+	UserResponseDto changeUserStatus(Long userId, UserStatus status); //admin functionality
+	List<UserResponseDto> getAllActiveUsers(); //get all active users
+	List<UserResponseDto> getUsersByStatus(UserStatus status); //admin functionality
+
 }//UserService interface ends
