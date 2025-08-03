@@ -6,17 +6,24 @@ import Payment from "./pages/Payment";
 import HomePage from "./pages/HomePage";
 import CategoryPage from "./pages/CategoryPage";
 import SearchResultsPage from "./pages/SearchResultsPage";
+import InvoicePage from "./pages/InvoicePage";
+import OrderHistory from "./pages/OrderHistory";
+import Cart from "./pages/Cart";
 
 const router = createBrowserRouter(
     [
+      
       {path: "/", element: <Login />},
       {path: "/register", element: <Register />},
       {path: "/itemDetailsPage", element: <ItemDetailsPage />},
+      {path: "/cart", element: <Cart />},
       {path: "/payment", element: <Payment />},
       {path: "/homepage", element: <HomePage/>},
       {path: "/category/:name",element:<CategoryPage/>},
-      {path: "/search", element:<SearchResultsPage/>}
-    
+      {path: "/search", element:<SearchResultsPage/>},
+      {path: "/orderHistory", element:<OrderHistory/>},
+      {path:"/invoicePage",element:<InvoicePage/>}
+
     ]
   )
 
