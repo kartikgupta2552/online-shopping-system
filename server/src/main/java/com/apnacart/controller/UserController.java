@@ -2,6 +2,8 @@ package com.apnacart.controller;
 
 import java.util.List;
 
+import ch.qos.logback.core.pattern.util.RegularEscapeUtil;
+import com.apnacart.service.DotNetIntegrationService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -42,6 +44,7 @@ import lombok.RequiredArgsConstructor;
 public class UserController {
 	
 	private final UserService userService;
+	private final DotNetIntegrationService dotNetIntegrationService;
 	
 
 	//swagger documentation
@@ -280,6 +283,22 @@ public class UserController {
 		return ResponseEntity.ok(response);
 	}//deleteUser() ends
 
+	//=============================================================================================================
+	//dotnet apis
+
+	@GetMapping("/dotnet-health")
+	public ResponseEntity<ApiResponse<String>> getDotNetHealth(){
+		String health = dotNetIntegrationService.checkDotNetApiHealth();
+		ApiResponse<String> response = ApiResponse.success("dotnet server running successfully!",health);
+		return  ResponseEntity.ok(response);
+	}//getDotNetHealth() ends
+
+	@GetMapping("/dotnet-greet")
+	public ResponseEntity<ApiResponse<String>> getDotNetGreet(@RequestParam String user){
+		String greeting = dotNetIntegrationService.getDotNetGreeting(user);
+		ApiResponse<String> response = ApiResponse.success("Greeted successfully.",greeting);
+		return ResponseEntity.ok(response);
+	}//getDotNetGreet() ends
 	
 	
 }//UserController class ends
