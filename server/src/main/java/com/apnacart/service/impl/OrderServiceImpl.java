@@ -6,8 +6,8 @@ import com.apnacart.dto.request.OrderRequestDto;
 import com.apnacart.dto.response.OrderResponseDto;
 import com.apnacart.entity.Order;
 import com.apnacart.entity.OrderStatus;
-import com.apnacart.entity.User;
-import com.apnacart.exception.UserNotFoundException;
+import com.apnacart.exception.ResourceAlreadyExistsException;
+import com.apnacart.exception.ResourceNotFoundException;
 import com.apnacart.service.OrderService;
 
 import com.apnacart.util.OrderMapper;
@@ -38,7 +38,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderResponseDto getOrderById(Long orderId) {
         Order order = orderDao.findById(orderId)
-                .orElseThrow(()-> new RuntimeException("No such order"));
+                .orElseThrow(()-> new ResourceNotFoundException("No such order with id : " + orderId));
         return orderMapper.toOrderResponseDto(order);
     }//getOrderById() ends
 
@@ -56,9 +56,9 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public void cancelOrder(Long orderId) {
         Order order = orderDao.findById(orderId)
-                .orElseThrow(()-> new RuntimeException("No such order found!"));
+                .orElseThrow(()-> new ResourceNotFoundException("No such order found with id : " + orderId));
         if(order.getStatus() == OrderStatus.CANCELLED)
-            throw new RuntimeException("The order with id " + orderId + " is already cancelled!");
+            throw new ResourceAlreadyExistsException("The order with id " + orderId + " is already cancelled!");
         order.setStatus(OrderStatus.CANCELLED);
         orderDao.save(order);
     }//softDeleteOrder() ends
@@ -71,7 +71,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public OrderResponseDto changeOrderStatus(Long orderId, OrderStatus status) {
         Order order = orderDao.findById(orderId)
-                .orElseThrow(()-> new RuntimeException("No such order exists!"));
+                .orElseThrow(()-> new ResourceNotFoundException("No such order exists with id : " + orderId));
         order.setStatus(status);
         orderDao.save(order);
         return orderMapper.toOrderResponseDto(order);
@@ -81,7 +81,7 @@ public class OrderServiceImpl implements OrderService {
     @Override
     public void deleteOrder(Long orderId) {
         if(!orderDao.existsById(orderId))
-            throw new RuntimeException("No such order exists!");
+            throw new ResourceNotFoundException("No such order exists with id : " + orderId);
         orderDao.deleteById(orderId);
     }//deleteOrder() ends
 

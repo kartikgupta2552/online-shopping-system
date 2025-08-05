@@ -58,6 +58,11 @@ public class GlobalExceptionHandler {
 	//user related exceptions
 	
 	//handle user already exists
+
+	/**
+	 * @deprecated  use ResourceAlreadyExistsException instead
+	 */
+	@Deprecated
 	@ExceptionHandler(UserAlreadyExistsException.class)
 	public ResponseEntity<ApiResponse<Void>> handleUserAlreadyExists(UserAlreadyExistsException ex){
 		ApiResponse<Void> response = ApiResponse.error("User already exists!",ex.getMessage());
@@ -67,6 +72,10 @@ public class GlobalExceptionHandler {
 	}//handleUserAlreadyExists() ends
 	
 	//handle user not found
+	/**
+	 * @deprecated  use ResourceNotFoundException instead
+	 */
+	@Deprecated
 	@ExceptionHandler(UserNotFoundException.class)
 	public ResponseEntity<ApiResponse<Void>> handleUserNotFound(UserNotFoundException ex){
 		ApiResponse<Void> response = ApiResponse.error("No such user found!",ex.getMessage());
