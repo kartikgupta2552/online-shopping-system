@@ -2,6 +2,7 @@ package com.apnacart.controller;
 
 import java.util.List;
 
+import com.apnacart.exception.UserAlreadyExistsException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -279,6 +280,7 @@ public class UserController {
 		ApiResponse<String> response = ApiResponse.success("User deleted succesfully", null);
 		return ResponseEntity.ok(response);
 	}//deleteUser() ends
+
 	
 	
 }//UserController class ends

@@ -3,6 +3,7 @@ package com.apnacart.service.impl;
 
 import java.util.List;
 
+import com.apnacart.exception.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -14,12 +15,7 @@ import com.apnacart.dto.request.UserUpdateDto;
 import com.apnacart.dto.response.AuthenticationResponseDto;
 import com.apnacart.dto.response.UserResponseDto;
 import com.apnacart.entity.User;
-import com.apnacart.entity.UserRole;
 import com.apnacart.entity.UserStatus;
-import com.apnacart.exception.AccountInactiveException;
-import com.apnacart.exception.InvalidCredentialsException;
-import com.apnacart.exception.UserAlreadyExistsException;
-import com.apnacart.exception.UserNotFoundException;
 import com.apnacart.service.UserService;
 import com.apnacart.util.JwtUtil;
 import com.apnacart.util.UserMapper;
@@ -43,13 +39,13 @@ public class UserServiceImpl implements UserService {
 	@Transactional(readOnly = true)
 	private User getUserById(Long userId) {
 		return userDao.findByUserId(userId)
-				.orElseThrow(() -> new UserNotFoundException("User not found with id : " + userId));
+				.orElseThrow(() -> new ResourceNotFoundException("User not found with id : " + userId));
 	}//getUserById() ends
 	
 	@Transactional(readOnly = true)
 	private User getUserByEmail(String email) {
 		return userDao.findByEmail(email)
-				.orElseThrow(() -> new UserNotFoundException("User not found with email : " + email));
+				.orElseThrow(() -> new ResourceNotFoundException("User not found with email : " + email));
 	}//getUserByEmail() ends
 
 	//above are private helper methods
@@ -70,7 +66,7 @@ public class UserServiceImpl implements UserService {
 	public void deleteUser(Long userId) {
 		//check if user already exists or not
 		if(!userDao.existsById(userId)) {
-			throw new UserNotFoundException("No such user with id : " + userId);
+			throw new ResourceNotFoundException("No such user with id : " + userId);
 		}
 		userDao.deleteById(userId);
 
@@ -105,12 +101,12 @@ public class UserServiceImpl implements UserService {
 	public UserResponseDto registerUser(UserRegistrationDto registrationDto) {
 		//validate email availability
 		if(!isEmailAvailable(registrationDto.getEmail())) {
-			throw new UserAlreadyExistsException("this email already exists : " + registrationDto.getEmail());
+			throw new ResourceAlreadyExistsException("this email already exists : " + registrationDto.getEmail());
 		}
 		
 		//validate mobileNo availability
 		if(!isMobileNoAvailable(registrationDto.getMobileNo())) {
-			throw new UserAlreadyExistsException("this mobile no already exists : " + registrationDto.getMobileNo());
+			throw new ResourceAlreadyExistsException("this mobile no already exists : " + registrationDto.getMobileNo());
 		}
 		
 		//convert dto to user entity
@@ -139,14 +135,14 @@ public class UserServiceImpl implements UserService {
 		//validate email exists if it is being changed
 		if(updateDto.getEmail()!=null && !existingUser.getEmail().equals(updateDto.getEmail())) {
 			if(!isEmailAvailable(updateDto.getEmail())) {
-				throw new UserAlreadyExistsException("this email already exists : " + updateDto.getEmail());
+				throw new ResourceAlreadyExistsException("this email already exists : " + updateDto.getEmail());
 			}
 		}
 		
 		//validate mobile no exists
 		if(updateDto.getMobileNo()!=null && !existingUser.getMobileNo().equals(updateDto.getMobileNo())) {
 			if(!isMobileNoAvailable(updateDto.getMobileNo())) {
-				throw new UserAlreadyExistsException("this mobile number already exists : " + updateDto.getMobileNo());
+				throw new ResourceAlreadyExistsException("this mobile number already exists : " + updateDto.getMobileNo());
 			}
 		}
 		
@@ -163,7 +159,7 @@ public class UserServiceImpl implements UserService {
 	@Transactional(readOnly = true)
 	public UserResponseDto getActiveUserById(Long userId) {
 		User user = userDao.findActiveUserById(userId)
-				.orElseThrow(()-> new UserNotFoundException("No such user found!"));
+				.orElseThrow(()-> new ResourceNotFoundException("No such user found!"));
 		return userMapper.toResponseDto(user);
 	}//getUserResponseById() ends
 
@@ -218,27 +214,24 @@ public class UserServiceImpl implements UserService {
 	}//authenticateUser() ends
 
 	@Override
-	public boolean softDeleteUser(Long userId) {
+	public void softDeleteUser(Long userId) {
 		User user = userDao.findById(userId)
-				.orElseThrow( () -> new UserNotFoundException("no such user found"));
+				.orElseThrow( () -> new ResourceNotFoundException("no such user found"));
 		user.setStatus(UserStatus.INACTIVE);
 		
 		userDao.save(user);
-		
-		return true;
 	}//softDeleteUser() ends
 
 	@Override
-	public boolean reactivateUser(Long userId) {
+	public void reactivateUser(Long userId) {
 		User user = userDao.findById(userId)
-				.orElseThrow(()-> new UserNotFoundException("No such user found!"));
+				.orElseThrow(()-> new ResourceNotFoundException("No such user found!"));
 		
 		if(user.getStatus() == UserStatus.ACTIVE) {
-			throw new UserAlreadyExistsException("The user " + user.getUserName() + " with id " + userId + " is already active!");
+			throw new ResourceAlreadyExistsException("The user " + user.getUserName() + " with id " + userId + " is already active!");
 		}
 		user.setStatus(UserStatus.ACTIVE);
 		userDao.save(user);
-		return true;
 	}//reactivateUser() ends
 	
 }//UserServiceImpl ends
