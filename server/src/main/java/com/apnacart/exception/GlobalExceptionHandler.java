@@ -58,34 +58,43 @@ public class GlobalExceptionHandler {
 	//user related exceptions
 	
 	//handle user already exists
+
+	/**
+	 * @deprecated  use ResourceAlreadyExistsException instead
+	 */
+	@Deprecated
 	@ExceptionHandler(UserAlreadyExistsException.class)
-	public ResponseEntity<ApiResponse<Object>> handleUserAlreadyExists(UserAlreadyExistsException ex){
-		ApiResponse<Object> response = ApiResponse.error("User already exists!",ex.getMessage());
+	public ResponseEntity<ApiResponse<Void>> handleUserAlreadyExists(UserAlreadyExistsException ex){
+		ApiResponse<Void> response = ApiResponse.error("User already exists!",ex.getMessage());
 		return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
 		//HttpStatus.CONFLICT = error 409
 		//apiresponse is object type because no specific type of object is returned(no object returned at all), hence object class used
 	}//handleUserAlreadyExists() ends
 	
 	//handle user not found
+	/**
+	 * @deprecated  use ResourceNotFoundException instead
+	 */
+	@Deprecated
 	@ExceptionHandler(UserNotFoundException.class)
-	public ResponseEntity<ApiResponse<Object>> handleUserNotFound(UserNotFoundException ex){
-		ApiResponse<Object> response = ApiResponse.error("No such user found!",ex.getMessage());
+	public ResponseEntity<ApiResponse<Void>> handleUserNotFound(UserNotFoundException ex){
+		ApiResponse<Void> response = ApiResponse.error("No such user found!",ex.getMessage());
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
 		//HttpStatus.UNAUTHORIZED : error 401
 	}//handleUserNotFound() ends
 	
 	//handle invalid credentials
 	@ExceptionHandler(InvalidCredentialsException.class)
-	public  ResponseEntity<ApiResponse<Object>> handleInvalidCredentials(InvalidCredentialsException ex){
-		ApiResponse<Object> response = ApiResponse.error("Invalid Credentials!",ex.getMessage());
+	public  ResponseEntity<ApiResponse<Void>> handleInvalidCredentials(InvalidCredentialsException ex){
+		ApiResponse<Void> response = ApiResponse.error("Invalid Credentials!",ex.getMessage());
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
 		//HttpStatus.UNAUTHORIZED : error 401
 	}//handleInvalidCredentials() ends
 	
 	//handle inactive account
 	@ExceptionHandler(AccountInactiveException.class)
-	public ResponseEntity<ApiResponse<Object>> handleAccountInactive(AccountInactiveException ex){
-		ApiResponse<Object> response = ApiResponse.error("This account is inactive!",ex.getMessage());
+	public ResponseEntity<ApiResponse<Void>> handleAccountInactive(AccountInactiveException ex){
+		ApiResponse<Void> response = ApiResponse.error("This account is inactive!",ex.getMessage());
 		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
 		//HttpStatus.FORBIDDEN : error 403
 	}//handleAccountInactive() ends
@@ -95,24 +104,24 @@ public class GlobalExceptionHandler {
 	
 	//handle JWT token expired exception
 	@ExceptionHandler(JwtTokenExpiredException.class)
-	public ResponseEntity<ApiResponse<Object>> handleJwtTokensExpired(JwtTokenExpiredException ex){
-		ApiResponse<Object> response = ApiResponse.error("Session expired. Please login again.",ex.getMessage());
+	public ResponseEntity<ApiResponse<Void>> handleJwtTokensExpired(JwtTokenExpiredException ex){
+		ApiResponse<Void> response = ApiResponse.error("Session expired. Please login again.",ex.getMessage());
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
 		//HttpStatus.UNAUTHORIZED : error 401
 	}//handleJwtTokensExpired() ends
 	
 	//handle jwt invalid exception
 	@ExceptionHandler(JwtTokenInvalidException.class)
-	public ResponseEntity<ApiResponse<Object>> handleJwtTokenInvalid(JwtTokenInvalidException ex){
-		ApiResponse<Object> response = ApiResponse.error("Invalid token. Access denied",ex.getMessage());
+	public ResponseEntity<ApiResponse<Void>> handleJwtTokenInvalid(JwtTokenInvalidException ex){
+		ApiResponse<Void> response = ApiResponse.error("Invalid token. Access denied",ex.getMessage());
 		return ResponseEntity.status(HttpStatus.FORBIDDEN).body(response);
 		//HttpStatus.FORBIDDEN : error 403
 	}//handleJwtTokenInvalid() ends
 	
 	//handle missing jwt token
 	@ExceptionHandler(JwtTokenMissingException.class)
-	public ResponseEntity<ApiResponse<Object>> handleJwtTokenMissing(JwtTokenMissingException ex){
-		ApiResponse<Object> response = ApiResponse.error("Authentication required. Please login to access this page.",ex.getMessage());
+	public ResponseEntity<ApiResponse<Void>> handleJwtTokenMissing(JwtTokenMissingException ex){
+		ApiResponse<Void> response = ApiResponse.error("Authentication required. Please login to access this page.",ex.getMessage());
 		return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(response);
 		//HttpStatus.UNAUTHORIZED : error 401
 	}//handleJwtTokenMissing() ends
@@ -122,8 +131,8 @@ public class GlobalExceptionHandler {
 	
 	//handle all other runtime exceptions
 	@ExceptionHandler(RuntimeException.class)
-	public ResponseEntity<ApiResponse<Object>> handleRuntimeException(RuntimeException ex){
-		ApiResponse<Object> response = ApiResponse.error("An error occurred.",ex.getMessage());
+	public ResponseEntity<ApiResponse<Void>> handleRuntimeException(RuntimeException ex){
+		ApiResponse<Void> response = ApiResponse.error("An error occurred.",ex.getMessage());
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);
 		//HttpStatus.INTERNAL_SERVER_ERROR : error 500
 	}//handleRuntimeException() ends

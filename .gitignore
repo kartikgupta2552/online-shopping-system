@@ -52,3 +52,10 @@ server/target/classes/application.properties
 .Trashes
 ehthumbs.db
 Thumbs.db
+
+# Eclipse/IDE directories
+server/.metadata/
+# General IDE config files/folders
+*.iml
+.idea/
+.vscode/
