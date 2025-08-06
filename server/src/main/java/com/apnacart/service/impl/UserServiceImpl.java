@@ -172,6 +172,17 @@ public class UserServiceImpl implements UserService {
 				.toList();
 	}//getAllUserResponses() ends
 
+	/**
+	 * @return users of all types
+	 */
+	@Override
+	public List<UserResponseDto> getAllUsers() {
+		return userDao.findAll()
+				.stream()
+				.map(userMapper::toResponseDto)
+				.toList();
+	}//getAllUsers() ends
+
 	@Override
 	public AuthenticationResponseDto authenticateUser(UserLoginDto loginDto) {
 		//1. find user by email

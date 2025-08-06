@@ -130,7 +130,7 @@ public class UserController {
 			description = "updates user profile with validations for user email/mobile number."
 			)
 	// update user profile
-	@PutMapping("{userId}/profile")
+	@PutMapping("/{userId}/profile")
 	public ResponseEntity<ApiResponse<UserResponseDto>> updateUserProfile(@PathVariable Long userId,
 			@Valid @RequestBody UserUpdateDto updateDto) {
 			UserResponseDto user = userService.updateUser(userId, updateDto);
@@ -156,7 +156,7 @@ public class UserController {
 	//get all users
 	@GetMapping("/all")
 	public ResponseEntity<ApiResponse<List<UserResponseDto>>> getAllUsers(){
-		List<UserResponseDto> users = userService.getAllActiveUsers();
+		List<UserResponseDto> users = userService.getAllUsers();
 		ApiResponse<List<UserResponseDto>> response = ApiResponse.success("Users retrieved successfully", users);
 		return ResponseEntity.ok(response);
 	}//getAllUsersClean() ends
