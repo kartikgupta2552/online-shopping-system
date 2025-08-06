@@ -21,11 +21,14 @@ import Users from "./admin/pages/Users";
 import Products from "./admin/pages/Products";
 import Orders from "./admin/pages/Orders";
 import Categories from "./admin/pages/Categories";
+import "bootstrap-icons/font/bootstrap-icons.css";
+import { CartProvider } from './context/CartContext';
+
 
 const router = createBrowserRouter(
     [
       
-      {path: "/", element: <Login />},
+      {path: "/", element: <HomePage />},
       // {path: "/admin", element: (
       //   <ProtectedAdminRoute>
       //     <AdminDashboard />
@@ -45,6 +48,7 @@ const router = createBrowserRouter(
       ]
     },
       {path: "/register", element: <Register />},
+      {path:"/login",element:<Login />},
       {path: "/cart", element: <Cart />},
       // {path: "/wishList", element: <WishList />},
       {path: "/itemDetailsPage", element: <ItemDetailsPage />},
@@ -61,7 +65,9 @@ const router = createBrowserRouter(
 
  const App = () => {
   return <div>
-    <RouterProvider router={router} />
+    <CartProvider>
+      <RouterProvider router={router} />
+    </CartProvider>
   </div>
 }
 
