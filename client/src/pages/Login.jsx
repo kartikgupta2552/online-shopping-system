@@ -57,7 +57,7 @@ const Login = () => {
       localStorage.setItem("token",backendUser.token); //save token in local storage
       localStorage.setItem("user",JSON.stringify({
         userId:backendUser.userId,
-        email: backendUser.userName,
+        email: backendUser.email,
         userName: backendUser.userName,
         userRole: backendUser.userRole,
         userStatus: backendUser.userStatus

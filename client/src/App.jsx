@@ -11,18 +11,39 @@ import SearchResultsPage from "./pages/SearchResultsPage";
 import InvoicePage from "./pages/InvoicePage";
 import OrderHistory from "./pages/OrderHistory";
 import ProtectedAdminRoute from "./components/ProtectedAdminRoute";
-import AdminDashboard from "./pages/AdminDashboard";
+// import AdminDashboard from "./pages/AdminDashboard";
 // import Cart from "./pages/Cart";
+// import { DashboardLayout } from "./admin/layouts/dashboard/layout";
+// dashboardlayout inside {} because it is not default export
+import AdminShell from "./admin/AdminShell";
+import AdminDashboard from "./admin/pages/AdminDashboard";
+import Users from "./admin/pages/Users";
+import Products from "./admin/pages/Products";
+import Orders from "./admin/pages/Orders";
+import Categories from "./admin/pages/Categories";
 
 const router = createBrowserRouter(
     [
       
       {path: "/", element: <Login />},
+      // {path: "/admin", element: (
+      //   <ProtectedAdminRoute>
+      //     <AdminDashboard />
+      //   </ProtectedAdminRoute>
+      // )},
       {path: "/admin", element: (
         <ProtectedAdminRoute>
-          <AdminDashboard />
+          <AdminShell />
         </ProtectedAdminRoute>
-      )},
+      ),
+      children : [
+        { path: "", element: <AdminDashboard /> },       // /admin
+    { path: "users", element: <Users /> },           // /admin/users
+    { path: "products", element: <Products /> },     // /admin/products
+    { path: "orders", element: <Orders /> },         // /admin/orders
+    { path: "categories", element: <Categories /> }, // /admin/categories
+      ]
+    },
       {path: "/register", element: <Register />},
       {path: "/cart", element: <Cart />},
       // {path: "/wishList", element: <WishList />},
