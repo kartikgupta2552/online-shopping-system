@@ -1,14 +1,17 @@
+
 import React, { useState } from "react";
-import App from "../App";
+import axios from 'axios';
 import { Link } from "react-router-dom";
+import BASE_URL from "../api/apiConfig";
 
 const Register = () => {
   const [formData, setFormData] = useState({
-    name: "",
+    userName: "",
     email: "",
     password: "",
     confirmPassword: "",
-    mobile: "",
+    mobileNo: "",
+    address: ""
   });
 
   const [errors, setErrors] = useState({});
@@ -24,125 +27,110 @@ const Register = () => {
     e.preventDefault();
     let tempErrors = {};
 
-    if (!formData.name.trim()) tempErrors.name = "Name is required";
-
+    if (!formData.userName.trim()) tempErrors.userName = "Name is required";
     if (!formData.email.trim()) tempErrors.email = "Email is required";
     else if (!/\S+@\S+\.\S+/.test(formData.email))
       tempErrors.email = "Invalid email";
 
     if (!formData.password) tempErrors.password = "Password is required";
-    else if (formData.password.length < 6) {
+    else if (formData.password.length < 6)
       tempErrors.password = "Password must be at least 6 characters";
-    }
 
     if (!formData.confirmPassword)
       tempErrors.confirmPassword = "Confirm your password";
     else if (formData.password !== formData.confirmPassword)
       tempErrors.confirmPassword = "Passwords do not match";
 
-    if (!formData.mobile.trim())
-      tempErrors.mobile = "Mobile number is required";
-    else if (!/^\d{10}$/.test(formData.mobile))
-      tempErrors.mobile = "Enter 10-digit mobile number";
+    if (!formData.mobileNo.trim())
+      tempErrors.mobileNo = "Mobile number is required";
+    else if (!/^\d{10}$/.test(formData.mobileNo))
+      tempErrors.mobileNo = "Enter 10-digit mobile number";
+
+    if (!formData.address.trim())
+      tempErrors.address = "Address is required";
 
     if (Object.keys(tempErrors).length > 0) {
       setErrors(tempErrors);
+      return;
     }
-    else{
-      setErrors({})
+
+    setErrors({});
+    const { confirmPassword, ...dataToSend } = formData;
+
+    // ✅ Log to confirm data structure
+    console.log("Sending to backend:", dataToSend);
+
+    axios.post(`${BASE_URL}/api/users/register`, dataToSend, {
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    })
+    .then((response) => {
       alert("Registered successfully ✅");
-      // Now you can send data to server or navigate to login
-    }
+      // optionally navigate
+    })
+    .catch((error) => {
+      console.error("Registration failed:", error.response?.data || error);
+      alert("Registration failed ❌");
+    });
   };
 
   return (
     <div className="container bg-secondary vh-100 d-flex align-items-center justify-content-center">
       <div className="row w-100">
-        <div className="col-md-6  col-lg-5 mx-auto">
+        <div className="col-md-6 col-lg-5 mx-auto">
           <div className="card shadow p-4">
             <h3 className="text-center mb-4">Register</h3>
             <form onSubmit={handleSubmit}>
+              {/* userName */}
               <div className="mb-3">
-                <label htmlFor="name">Name</label>
-                <input
-                  type="text"
-                  id="name"
-                  className="form-control"
-                  placeholder="Enter name"
-                  value={formData.name}
-                  onChange={handleChange}
-                />
-                {errors.name && (
-                  <small className="text-danger">{errors.name}</small>
-                )}
+                <label htmlFor="userName">Name</label>
+                <input type="text" id="userName" className="form-control" value={formData.userName} onChange={handleChange} />
+                {errors.userName && <small className="text-danger">{errors.userName}</small>}
               </div>
+
+              {/* email */}
               <div className="mb-3">
                 <label htmlFor="email">Email</label>
-                <input
-                  type="text"
-                  id="email"
-                  className="form-control"
-                  placeholder="Enter email"
-                  value={formData.email}
-                  onChange={handleChange}
-                />
-                {errors.email && (
-                  <small className="text-danger">{errors.email}</small>
-                )}
+                <input type="text" id="email" className="form-control" value={formData.email} onChange={handleChange} />
+                {errors.email && <small className="text-danger">{errors.email}</small>}
               </div>
+
+              {/* password */}
               <div className="mb-3">
                 <label htmlFor="password">Password</label>
-                <input
-                  type="password"
-                  id="password"
-                  className="form-control"
-                  placeholder="Enter password"
-                  value={formData.password}
-                  onChange={handleChange}
-                />
-                {errors.password && (
-                  <small className="text-danger">{errors.password}</small>
-                )}
+                <input type="password" id="password" className="form-control" value={formData.password} onChange={handleChange} />
+                {errors.password && <small className="text-danger">{errors.password}</small>}
               </div>
+
+              {/* confirmPassword */}
               <div className="mb-3">
-                <label htmlFor="confirm-password">Password</label>
-                <input
-                  type="password"
-                  id="confirmPassword"
-                  className="form-control"
-                  placeholder="Confirm password"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                />
-                {errors.confirmPassword && (
-                  <small className="text-danger">
-                    {errors.confirmPassword}
-                  </small>
-                )}
+                <label htmlFor="confirmPassword">Confirm Password</label>
+                <input type="password" id="confirmPassword" className="form-control" value={formData.confirmPassword} onChange={handleChange} />
+                {errors.confirmPassword && <small className="text-danger">{errors.confirmPassword}</small>}
               </div>
+
+              {/* mobileNo */}
               <div className="mb-3">
-                <label htmlFor="mobile">Mobile</label>
-                <input
-                  type="number"
-                  id="mobile"
-                  className="form-control"
-                  placeholder="Enter Mobile"
-                  value={formData.mobile}
-                  onChange={handleChange}
-                />
-                {errors.mobile && (
-                  <small className="text-danger">{errors.mobile}</small>
-                )}
+                <label htmlFor="mobileNo">Mobile No</label>
+                <input type="text" id="mobileNo" className="form-control" value={formData.mobileNo} onChange={handleChange} />
+                {errors.mobileNo && <small className="text-danger">{errors.mobileNo}</small>}
               </div>
+
+              {/* address */}
+              <div className="mb-3">
+                <label htmlFor="address">Address</label>
+                <input type="text" id="address" className="form-control" value={formData.address} onChange={handleChange} />
+                {errors.address && <small className="text-danger">{errors.address}</small>}
+              </div>
+
               <div className="d-flex justify-content-center">
                 <button className="btn btn-primary w-75">Sign up</button>
               </div>
             </form>
-            <p className="text-center">
-              Already have an account?
-              <Link to="/" className="btn btn-link">
-                Sign in
-              </Link>
+
+            <p className="text-center mt-3">
+              Already have an account? <Link to="/" className="btn btn-link">Sign in</Link>
             </p>
           </div>
         </div>
@@ -150,4 +138,6 @@ const Register = () => {
     </div>
   );
 };
+
 export default Register;
+
