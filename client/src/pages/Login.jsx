@@ -1,13 +1,15 @@
 import React, { useState } from "react";
 import { Link,useNavigate } from "react-router-dom";
 
+const API_URL = "http://localhost:8080/api/users/login";
+
 const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
       const navigate = useNavigate();
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
     const validationErrors = {};
@@ -25,10 +27,47 @@ const Login = () => {
 
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
-    } else {
-      setErrors({});
-      // alert("Login Successful");
-      navigate("/homepage", { state: { loginSuccess: true } });
+      return ;
+    }
+
+    //backend login authentication
+    try {
+      const response = await fetch (API_URL, {  //fetch sends credentials to the backend api
+        method:"POST",
+        headers:{"Content-Type": "application/json"},
+        body: JSON.stringify({email,password}),  
+      });
+
+      if(!response.ok){
+        //login failed
+        setErrors({general: "Invalid email or password"});
+        return;
+      }
+
+      const result = await response.json();
+      const backendUser = result.data;
+      //if something other than token/data comes from backend
+      if(!backendUser || !backendUser.token || !backendUser.userRole){
+        setErrors({general: "Invalid response from the server. Please try again after sometime."});
+        return;
+      }
+
+
+      //get JWT and userinfo from the response send via backend
+      localStorage.setItem("token",backendUser.token); //save token in local storage
+      localStorage.setItem("user",JSON.stringify({
+        userId:backendUser.userId,
+        email: backendUser.userName,
+        userName: backendUser.userName,
+        userRole: backendUser.userRole,
+        userStatus: backendUser.userStatus
+      }));//save user
+      
+      //redirect to homepage after login
+      navigate("/homepage",{state: {loginSuccess: true} });
+
+    } catch (error) {
+      setErrors({general : "Login failed, please try again."});
     }
   };
 
@@ -38,6 +77,9 @@ const Login = () => {
         <div className="col-md-6 col-lg-4  mx-auto">
           <div className="card shadow p-4">
             <h3 className="text-center mb-4">Login</h3>
+            {errors.general && (
+              <div className="alert alert-danger text-center" >{errors.general}</div>
+            )}
             <form onSubmit={handleSubmit}>
               <div className="mb-3">
                 <label htmlFor="email">Email Address</label>

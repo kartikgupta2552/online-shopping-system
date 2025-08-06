@@ -38,7 +38,7 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/users")
-@CrossOrigin(origins = "http://localhost:3000")//for react frontend
+@CrossOrigin(origins = "http://localhost:5173")//for react frontend
 @Tag(name = "User Management", description = "APIs for user related functions like registration, authentication and profile management")
 public class UserController {
 	
