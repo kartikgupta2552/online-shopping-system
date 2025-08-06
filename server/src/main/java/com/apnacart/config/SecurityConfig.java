@@ -35,9 +35,7 @@ public class SecurityConfig {
 			//confifure endpoint authorization rules
 			.authorizeHttpRequests(auth -> auth
 					// public endpoints(no authentication required)
-//					.requestMatchers("/api/users/register", "/api/users/login").permitAll() //login and registration
-					.requestMatchers("/api/users/**").permitAll()
-
+					.requestMatchers("/api/users/register", "/api/users/login", "/image/product/**").permitAll() //login and registration
 					.requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll() // swagger documentation
 					.requestMatchers("/error").permitAll() // error pages
 					// every other endpoints will be protected -> JWT authentication required

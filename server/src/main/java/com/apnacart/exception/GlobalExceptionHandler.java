@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.apnacart.payload.ApiResponse;
 
+import io.jsonwebtoken.io.IOException;
+
 @RestControllerAdvice 
 //Any exceptions thrown in the REST controllers will be intercepted globally by this class
 //marks this class as global exception handler for all controllers
@@ -36,7 +38,7 @@ public class GlobalExceptionHandler {
 			errors.put(fieldName, errorMessage);
 		});
 		
-		ApiResponse<Void> response = ApiResponse.error("validation failed!",errors);
+		// ApiResponse<Void> response = ApiResponse.error("validation failed!",errors);
 		//response.setData(errors);
 		return ResponseEntity.badRequest().body(ApiResponse.<Void>error("validation failed!", errors));
 		//
@@ -128,6 +130,11 @@ public class GlobalExceptionHandler {
 	
 	//================================================================================================
 	//all other miscellaneous exceptions
+
+	@ExceptionHandler(IOException.class)
+	public ResponseEntity<ApiResponse<Void>> handleIOException(IOException ex){
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ApiResponse.error("File operation failed", ex.getMessage()));
+	}
 	
 	//handle all other runtime exceptions
 	@ExceptionHandler(RuntimeException.class)
