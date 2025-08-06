@@ -10,12 +10,19 @@ import CategoryPage from "./pages/CategoryPage";
 import SearchResultsPage from "./pages/SearchResultsPage";
 import InvoicePage from "./pages/InvoicePage";
 import OrderHistory from "./pages/OrderHistory";
+import ProtectedAdminRoute from "./components/ProtectedAdminRoute";
+import AdminDashboard from "./pages/AdminDashboard";
 // import Cart from "./pages/Cart";
 
 const router = createBrowserRouter(
     [
       
       {path: "/", element: <Login />},
+      {path: "/admin", element: (
+        <ProtectedAdminRoute>
+          <AdminDashboard />
+        </ProtectedAdminRoute>
+      )},
       {path: "/register", element: <Register />},
       {path: "/cart", element: <Cart />},
       // {path: "/wishList", element: <WishList />},

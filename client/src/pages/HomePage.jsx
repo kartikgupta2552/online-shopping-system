@@ -1,4 +1,5 @@
 import React from "react";
+import { useEffect } from "react";
 import MyNavbar from "../components/MyNavbar.jsx";
 import Product from "../components/Product.jsx";
 import Footer from "../components/Footer.jsx";
@@ -12,16 +13,32 @@ import { useLocation ,useNavigate,Link} from "react-router-dom";
 
 
 function HomePage() {
-    // Pick your sausage: all or some categories
+    // select 3 categories to be displayed on the homepage
     const selectedCategories = categories.slice(0, 3);
     const location = useLocation();
-        const navigate = useNavigate();
+    const navigate = useNavigate();
+    
+    useEffect( () => {
+        if(location.state && location.state.unauthorized){
+            //remove the unauthorized message after showing it once
+            const timeout = setTimeout(()=>{
+                navigate("/homepage",{replace:true,state:{}});
+            },2500);
+            return () => clearTimeout(timeout);
+        }
+    },[location,navigate] );
+
     return (
         <>
             <MyNavbar/>
             {location.state && location.state.loginSuccess && (
                 <div className="alert alert-success text-center" role="alert">
                     Logged in successfully!
+                </div>
+            )}
+            {location.state && location.state.unauthorized && (
+                <div>
+                    <b>Access Denied</b> Only <u>Admin</u> allowed.
                 </div>
             )}
             <div className="container">
