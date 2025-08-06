@@ -44,6 +44,9 @@ public class Product {
     @Min(0)
     private int quantity;
 
+    @Column(length = 255)
+    private String imagePath;
+
     @ManyToOne
     @JoinColumn(name = "sub_category_id", nullable = false)
     @JsonBackReference

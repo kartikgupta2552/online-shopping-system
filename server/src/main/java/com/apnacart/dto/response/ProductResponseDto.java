@@ -19,4 +19,6 @@ public class ProductResponseDto {
 
     private Long subCategoryId;
 
+    private String imagePath;
+
 }
