@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import axios from 'axios';
+import BASE_URL from "../api/apiConfig";
 import { Link,useNavigate } from "react-router-dom";
 
 const Login = () => {
@@ -7,7 +9,7 @@ const Login = () => {
   const [errors, setErrors] = useState({});
       const navigate = useNavigate();
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault();
 
     const validationErrors = {};
@@ -28,7 +30,24 @@ const Login = () => {
     } else {
       setErrors({});
       // alert("Login Successful");
-      navigate("/homepage", { state: { loginSuccess: true } });
+
+      try {
+        const response = await axios.post(
+          `${BASE_URL}/api/users/login`,
+          { email, password }
+        );
+
+        if (response.status === 200) {
+          navigate("/homepage", { state: { loginSuccess: true } });
+        } else {
+          alert("Login failed. Please check your credentials.");
+        }
+      } catch (error) {
+        console.error("Login error:", error);
+        alert("Login failed. Invalid credentials.");
+      }
+      
+      // navigate("/homepage", { state: { loginSuccess: true } });
     }
   };
 
