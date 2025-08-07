@@ -2,6 +2,7 @@ package com.apnacart.controller;
 
 import java.util.List;
 
+import com.apnacart.dto.request.PasswordChangeDto;
 import com.apnacart.entity.UserRole;
 import com.apnacart.exception.UserAlreadyExistsException;
 import org.springframework.http.HttpStatus;
@@ -242,7 +243,17 @@ public class UserController {
 		ApiResponse<UserResponseDto> response = ApiResponse.success("User retrieved successfully", user);
 		return ResponseEntity.ok(response);
 	}//getUserProfile() ends
-	
+
+	@PatchMapping("/{userId}/password")
+	public ResponseEntity<ApiResponse<Void>> changePassword(
+			@PathVariable Long userId,
+			@RequestBody PasswordChangeDto dto
+	) {
+		userService.changePassword(userId, dto.getOldPassword(), dto.getNewPassword());
+		return ResponseEntity.ok(ApiResponse.success("Password changed successfully", null));
+	}
+
+
 	//change user status
 	@Operation(
 			summary = "Change the user status (Admin functionality)",
@@ -300,7 +311,7 @@ public class UserController {
 			@RequestParam UserRole role //customer, admin
 			){
 		UserResponseDto user = userService.changeUserRole(userId, role);
-		ApiResponse<UserResponseDto> response = ApiResponse.success("User role updated sucessfully", user);
+		ApiResponse<UserResponseDto> response = ApiResponse.success("User role updated successfully", user);
 		return ResponseEntity.ok(response);
 	}//changeUserRole() ends
 

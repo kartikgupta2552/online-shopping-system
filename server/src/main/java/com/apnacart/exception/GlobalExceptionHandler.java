@@ -3,6 +3,7 @@ package com.apnacart.exception;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.jsonwebtoken.io.IOException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -128,6 +129,11 @@ public class GlobalExceptionHandler {
 	
 	//================================================================================================
 	//all other miscellaneous exceptions
+
+	@ExceptionHandler(IOException.class)
+	public ResponseEntity<ApiResponse<Void>> handleIOException(IOException ex){
+		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ApiResponse.error("File operation failed", ex.getMessage()));
+	}//handleIOException() ends
 	
 	//handle all other runtime exceptions
 	@ExceptionHandler(RuntimeException.class)

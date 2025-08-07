@@ -28,8 +28,8 @@ public class Category {
 	@Column(length = 50, nullable = false, unique = true)
 	private String categoryName;
 
-	@OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
+	@OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)
 	@JsonManagedReference
 	private List<SubCategory> subCategories;
 
-}
+}//Category ends

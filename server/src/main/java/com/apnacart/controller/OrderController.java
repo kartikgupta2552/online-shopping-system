@@ -15,7 +15,7 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/orders")
-@CrossOrigin(origins = "http://localhost:3000")//for react frontend
+@CrossOrigin(origins = "http://localhost:5173")//for react frontend
 @RequiredArgsConstructor
 public class OrderController {
     private final OrderService orderService;
@@ -41,7 +41,7 @@ public class OrderController {
         return ResponseEntity.ok(response);
     }//getAllOrders() ends
 
-    @DeleteMapping("{orderId}")
+    @DeleteMapping("/orders/{orderId}/cancel")
     public ResponseEntity<ApiResponse<String>> cancelOrder(@PathVariable Long orderId){
         orderService.cancelOrder(orderId);
         ApiResponse<String> response = ApiResponse.success("Order cancelled successfully!",null);

@@ -21,6 +21,7 @@ public interface UserService {
 	UserResponseDto updateUser(Long userId, UserUpdateDto updateDto);
 	UserResponseDto getActiveUserById(Long userId);  //get user by id
 	AuthenticationResponseDto authenticateUser(UserLoginDto loginDto); //user login - get user by email and password
+	void changePassword(Long userId, String oldPassword, String newPassword);
 
 	//admin functionalities
 	void reactivateUser(Long userId);

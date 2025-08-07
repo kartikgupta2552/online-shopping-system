@@ -155,6 +155,31 @@ public class UserServiceImpl implements UserService {
 		return userMapper.toResponseDto(updatedUser);
 	}//updateUser() ends
 
+	@Override
+	@Transactional
+	public void changePassword(Long userId, String oldPassword, String newPassword) {
+		// 1. Grab the user, or throw and mock them if they don’t exist.
+		User user = userDao.findById(userId)
+				.orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
+
+		// 2. Check the old password (never trust the frontend, not even once!).
+		if (!passwordEncoder.matches(oldPassword, user.getPassword())) {
+			throw new IllegalArgumentException("Old password is incorrect"); // Or create a custom exception for "wrong password" if you want to be extra neat.
+		}
+
+		// 3. Validate new password (optional but recommended).
+		if (newPassword == null || newPassword.length() < 8) {
+			throw new IllegalArgumentException("New password must be at least 8 characters long (or whatever policy you desire)");
+		}
+
+		// 4. Hash the new password.
+		user.setPassword(passwordEncoder.encode(newPassword));
+
+		// 5. Save the user (don’t skip or you’ll rage when nothing updates).
+		userDao.save(user);
+	}
+
+
 	//dto-based getter methods
 	@Override
 	@Transactional(readOnly = true)
