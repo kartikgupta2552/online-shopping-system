@@ -60,11 +60,12 @@ const Login = () => {
         email: backendUser.email,
         userName: backendUser.userName,
         userRole: backendUser.userRole,
-        userStatus: backendUser.userStatus
+        userStatus: backendUser.userStatus,
+        token: backendUser.token
       }));//save user
       
       //redirect to homepage after login
-      navigate("/homepage",{state: {loginSuccess: true} });
+      navigate("/",{state: {loginSuccess: true} });
 
     } catch (error) {
       setErrors({general : "Login failed, please try again."});

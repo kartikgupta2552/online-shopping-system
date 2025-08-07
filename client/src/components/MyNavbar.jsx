@@ -45,7 +45,7 @@ function MyNavbar() {
   return (
     <nav className="navbar navbar-expand-lg bg-body-tertiary">
       <div className="container-fluid">
-        <Link className="nav-link active" aria-current="page" to="/homepage">
+        <Link className="nav-link active" aria-current="page" to="/">
           <strong> 🛒 ApnaCart</strong>
         </Link>
         <button
@@ -65,7 +65,7 @@ function MyNavbar() {
               <Link
                 className="nav-link active"
                 aria-current="page"
-                to="/homepage"
+                to="/"
               >
                 Home
               </Link>

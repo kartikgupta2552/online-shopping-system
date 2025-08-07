@@ -54,7 +54,7 @@ const router = createBrowserRouter(
       {path: "/itemDetailsPage", element: <ItemDetailsPage />},
       {path: "/cart", element: <Cart />},
       {path: "/payment", element: <Payment />},
-      {path: "/homepage", element: <HomePage/>},
+      {path: "/", element: <HomePage/>},
       {path: "/category/:name",element:<CategoryPage/>},
       {path: "/search", element:<SearchResultsPage/>},
       {path: "/orderHistory", element:<OrderHistory/>},

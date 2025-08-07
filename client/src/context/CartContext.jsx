@@ -1,73 +1,99 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect } from "react";
+import api from "../utils/api"; // <-- See above!
 
-// 1. Create the context object!
 export const CartContext = createContext(null);
 
-// 2. CartProvider holds cart & wishlist states (synced to localStorage)
 export const CartProvider = ({ children }) => {
-  // -- Cart state, initialized from LS or empty --
-  const [cart, setCart] = useState(() => {
-    try {
-      const stored = localStorage.getItem('cart');
-      return stored ? JSON.parse(stored) : [];
-    } catch {
-      return [];
-    }
-  });
+  const [cart, setCart] = useState([]);
+  const [wishlist, setWishlist] = useState([]);
 
-  const [wishlist, setWishlist] = useState(() => {
-    try {
-      const stored = localStorage.getItem('wishlist');
-      return stored ? JSON.parse(stored) : [];
-    } catch {
-      return [];
-    }
-  });
-
-  // -- Keep localStorage updated whenever state changes --
+  // 💉 On mount (and on login), fetch cart and wishlist from backend
   useEffect(() => {
-    localStorage.setItem('cart', JSON.stringify(cart));
-  }, [cart]);
-  useEffect(() => {
-    localStorage.setItem('wishlist', JSON.stringify(wishlist));
-  }, [wishlist]);
+    const fetchCartAndWishlist = async () => {
+      const token = JSON.parse(localStorage.getItem("user"))?.token;
+      if (!token) {
+        setCart([]);
+        setWishlist([]);
+        return;
+      }
+      try {
+        // GET the user's cart from backend
+        const cartResponse = await api.get("/cart");
+        setCart(cartResponse.data.data.cartItems || []);
 
-  // -- Add to Cart: no duplicates! --
-  const addToCart = (product) => {
-    setCart(prev =>
-      prev.some(item => item.id === product.id) ? prev : [...prev, product]
-    );
-    setWishlist(prev => prev.filter(item => item.id !== product.id));
+        // 🦴 Wishlists: If you have a backend endpoint, use it here.
+        // For now: empty array or local
+        setWishlist([]);
+      } catch (error) {
+        console.error("Failed to fetch cart or wishlist:", error);
+        setCart([]);
+        setWishlist([]);
+      }
+    };
+    fetchCartAndWishlist();
+  }, []);
+
+  /*** ACTIONS - All hit backend, then update local state ***/
+
+  // Add to cart (calls backend, then refreshes cart)
+  const addToCart = async (product) => {
+    try {
+      await api.post("/cart/add", { productId: product.id, quantity: 1 }); // You can extend to allow custom quantity
+      const cartResponse = await api.get("/cart");
+      setCart(cartResponse.data.data.cartItems || []);
+      // Optionally, remove from wishlist if backend supports that relationship
+    } catch (error) {
+      console.error("Failed to add to cart:", error);
+    }
   };
 
-  // -- Remove from Cart --
-  const removeFromCart = (id) => {
-    setCart(prev => prev.filter(item => item.id !== id));
+  // Remove from cart (by productId)
+  const removeFromCart = async (id) => {
+    try {
+      await api.delete(`/cart/item/${id}`);
+      const cartResponse = await api.get("/cart");
+      setCart(cartResponse.data.data.cartItems || []);
+    } catch (error) {
+      console.error("Failed to remove from cart:", error);
+    }
   };
 
-  // -- Clear Cart --
-  const clearCart = () => setCart([]);
+  // Clear cart via backend
+  const clearCart = async () => {
+    try {
+      await api.delete("/cart/clear");
+      setCart([]);
+    } catch (error) {
+      console.error("Failed to clear cart:", error);
+    }
+  };
 
-  // -- Add to Wishlist: also prevent duplicates --
+  // WISHLIST functions: 🦴
+  // Still using local state until you build a backend for it!
   const addToWishlist = (product) => {
-    setWishlist(prev =>
-      prev.some(item => item.id === product.id) ? prev : [...prev, product]
+    setWishlist((prev) =>
+      prev.some((item) => item.id === product.id) ? prev : [...prev, product]
     );
-    setCart(prev => prev.filter(item => item.id !== product.id));
+    setCart((prev) => prev.filter((item) => item.id !== product.id));
   };
 
-  // -- Remove from Wishlist --
   const removeFromWishlist = (id) => {
-    setWishlist(prev => prev.filter(item => item.id !== id));
+    setWishlist((prev) => prev.filter((item) => item.id !== id));
   };
 
-  // -- THE CONTEXT VALUE: like your site-wide toolbox --
+  // Expose everything in context
   return (
-    <CartContext.Provider value={{
-      cart, wishlist,
-      addToCart, removeFromCart, clearCart,
-      addToWishlist, removeFromWishlist
-    }}>
+    <CartContext.Provider
+      value={{
+        cart,
+        wishlist,
+        addToCart,
+        removeFromCart,
+        clearCart,
+        addToWishlist,
+        removeFromWishlist,
+      }}
+    >
       {children}
     </CartContext.Provider>
   );
