@@ -42,10 +42,12 @@ const Categories = () => {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       setCategories(catRes.data.data || []);
+      console.log(catRes.data.data);
       const subRes = await axios.get(`${API}/subcategory`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
       setSubCategories(subRes.data.data || []);
+      console.log(subRes.data.data);
     } catch (e) {
       setCategories([]);
       setSubCategories([]);
