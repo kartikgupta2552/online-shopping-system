@@ -4,12 +4,15 @@ import Register from "./pages/Register";
 import ItemDetailsPage from "./pages/ItemDetailsPage";
 import Payment from "./pages/Payment";
 import Cart from "./pages/Cart";
+
 // import WishList from "./pages/WishList";
+
 import HomePage from "./pages/HomePage";
 import CategoryPage from "./pages/CategoryPage";
 import SearchResultsPage from "./pages/SearchResultsPage";
 import InvoicePage from "./pages/InvoicePage";
 import OrderHistory from "./pages/OrderHistory";
+
 import ProtectedAdminRoute from "./components/ProtectedAdminRoute";
 // import AdminDashboard from "./pages/AdminDashboard";
 // import Cart from "./pages/Cart";
@@ -23,6 +26,7 @@ import Orders from "./admin/pages/Orders";
 import Categories from "./admin/pages/Categories";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import { CartProvider } from './context/CartContext';
+
 
 
 const router = createBrowserRouter(
@@ -48,9 +52,11 @@ const router = createBrowserRouter(
       ]
     },
       {path: "/register", element: <Register />},
+
       {path:"/login",element:<Login />},
       {path: "/cart", element: <Cart />},
       // {path: "/wishList", element: <WishList />},
+
       {path: "/itemDetailsPage", element: <ItemDetailsPage />},
       {path: "/cart", element: <Cart />},
       {path: "/payment", element: <Payment />},

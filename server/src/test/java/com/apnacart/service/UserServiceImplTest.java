@@ -2,20 +2,12 @@ package com.apnacart.service;
 
 import com.apnacart.dao.UserDao;
 import com.apnacart.dto.request.*;
-import com.apnacart.dto.response.UserResponseDto;
 import com.apnacart.entity.*;
-import com.apnacart.exception.*;
-import com.apnacart.service.impl.UserServiceImpl;
-import com.apnacart.util.UserMapper;
 import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.*;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.springframework.security.crypto.password.PasswordEncoder;
 
-import java.time.LocalDateTime;
-import java.util.*;
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.*;
 

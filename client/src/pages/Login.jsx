@@ -1,4 +1,6 @@
 import React, { useState } from "react";
+import axios from 'axios';
+import BASE_URL from "../api/apiConfig";
 import { Link,useNavigate } from "react-router-dom";
 
 const API_URL = "http://localhost:8080/api/users/login";
@@ -27,6 +29,7 @@ const Login = () => {
 
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
+
       return ;
     }
 
@@ -69,6 +72,7 @@ const Login = () => {
 
     } catch (error) {
       setErrors({general : "Login failed, please try again."});
+
     }
   };
 

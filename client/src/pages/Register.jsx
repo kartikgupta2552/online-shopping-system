@@ -1,17 +1,25 @@
+
 import React, { useState } from "react";
+
 import { Link, useNavigate } from "react-router-dom";
 
 // Set your real registration API endpoint
 const API_URL = "http://localhost:8080/api/users/register";
 
+import axios from 'axios';
+import { Link } from "react-router-dom";
+import BASE_URL from "../api/apiConfig";
+
+
 const Register = () => {
   // --- Form State, one true validation home ---
   const [formData, setFormData] = useState({
-    name: "",
+    userName: "",
     email: "",
     password: "",
     confirmPassword: "",
-    mobile: "",
+    mobileNo: "",
+    address: ""
   });
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
@@ -32,6 +40,7 @@ const Register = () => {
   const validate = (fields) => {
     const tempErrors = {};
 
+
     if (!fields.name.trim()) tempErrors.name = "Name is required";
 
     if (!fields.email.trim()) tempErrors.email = "Email is required";
@@ -40,6 +49,7 @@ const Register = () => {
 
     if (!fields.password) tempErrors.password = "Password is required";
     else if (fields.password.length < 6)
+
       tempErrors.password = "Password must be at least 6 characters";
 
     if (!fields.confirmPassword)
@@ -52,6 +62,10 @@ const Register = () => {
     else if (!/^\d{10}$/.test(fields.mobile))
       tempErrors.mobile = "Enter 10-digit mobile number";
 
+    if (!formData.address.trim())
+      tempErrors.address = "Address is required";
+
+
     return tempErrors;
   };
 
@@ -63,6 +77,7 @@ const Register = () => {
       setErrors(tempErrors);
       return;
     }
+    
     setLoading(true);
     setServerError("");
 
@@ -115,7 +130,7 @@ const Register = () => {
   return (
     <div className="container bg-secondary vh-100 d-flex align-items-center justify-content-center">
       <div className="row w-100">
-        <div className="col-md-6  col-lg-5 mx-auto">
+        <div className="col-md-6 col-lg-5 mx-auto">
           <div className="card shadow p-4">
             <h3 className="text-center mb-4">Register</h3>
             {serverError && (
@@ -124,7 +139,9 @@ const Register = () => {
               </div>
             )}
             <form onSubmit={handleSubmit}>
+              {/* userName */}
               <div className="mb-3">
+
                 <label htmlFor="name">Name</label>
                 <input
                   type="text"
@@ -138,9 +155,13 @@ const Register = () => {
                 {errors.name && (
                   <small className="text-danger">{errors.name}</small>
                 )}
+
               </div>
+
+              {/* email */}
               <div className="mb-3">
                 <label htmlFor="email">Email</label>
+
                 <input
                   type="text"
                   id="email"
@@ -153,9 +174,13 @@ const Register = () => {
                 {errors.email && (
                   <small className="text-danger">{errors.email}</small>
                 )}
+
               </div>
+
+              {/* password */}
               <div className="mb-3">
                 <label htmlFor="password">Password</label>
+
                 <input
                   type="password"
                   id="password"
@@ -168,8 +193,19 @@ const Register = () => {
                 {errors.password && (
                   <small className="text-danger">{errors.password}</small>
                 )}
+
               </div>
+
+              {/* confirmPassword */}
               <div className="mb-3">
+                <label htmlFor="confirmPassword">Confirm Password</label>
+                <input type="password" id="confirmPassword" className="form-control" value={formData.confirmPassword} onChange={handleChange} />
+                {errors.confirmPassword && <small className="text-danger">{errors.confirmPassword}</small>}
+              </div>
+
+              {/* mobileNo */}
+              <div className="mb-3">
+
                 <label htmlFor="confirmPassword">Confirm password</label>
                 <input
                   type="password"
@@ -183,8 +219,12 @@ const Register = () => {
                 {errors.confirmPassword && (
                   <small className="text-danger">{errors.confirmPassword}</small>
                 )}
+
               </div>
+
+              {/* address */}
               <div className="mb-3">
+
                 <label htmlFor="mobile">Mobile</label>
                 <input
                   type="tel"
@@ -199,7 +239,13 @@ const Register = () => {
                 {errors.mobile && (
                   <small className="text-danger">{errors.mobile}</small>
                 )}
+
+                <label htmlFor="address">Address</label>
+                <input type="text" id="address" className="form-control" value={formData.address} onChange={handleChange} />
+                {errors.address && <small className="text-danger">{errors.address}</small>}
+
               </div>
+
               <div className="d-flex justify-content-center">
                 <button
                   className="btn btn-primary w-75"
@@ -210,11 +256,13 @@ const Register = () => {
                 </button>
               </div>
             </form>
+
             <p className="text-center mt-2">
               Already have an account?
               <Link to="/login" className="btn btn-link">
                 Sign in
               </Link>
+
             </p>
           </div>
         </div>
@@ -224,3 +272,4 @@ const Register = () => {
 };
 
 export default Register;
+
