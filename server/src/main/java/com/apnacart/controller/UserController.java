@@ -2,6 +2,7 @@ package com.apnacart.controller;
 
 import java.util.List;
 
+import com.apnacart.entity.UserRole;
 import com.apnacart.exception.UserAlreadyExistsException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -130,7 +131,7 @@ public class UserController {
 			description = "updates user profile with validations for user email/mobile number."
 			)
 	// update user profile
-	@PutMapping("{userId}/profile")
+	@PutMapping("/{userId}/profile")
 	public ResponseEntity<ApiResponse<UserResponseDto>> updateUserProfile(@PathVariable Long userId,
 			@Valid @RequestBody UserUpdateDto updateDto) {
 			UserResponseDto user = userService.updateUser(userId, updateDto);
@@ -156,7 +157,7 @@ public class UserController {
 	//get all users
 	@GetMapping("/all")
 	public ResponseEntity<ApiResponse<List<UserResponseDto>>> getAllUsers(){
-		List<UserResponseDto> users = userService.getAllActiveUsers();
+		List<UserResponseDto> users = userService.getAllUsers();
 		ApiResponse<List<UserResponseDto>> response = ApiResponse.success("Users retrieved successfully", users);
 		return ResponseEntity.ok(response);
 	}//getAllUsersClean() ends
@@ -269,17 +270,39 @@ public class UserController {
 		return ResponseEntity.ok(response);
 	}//getUsersByStatus() ends
 	
-	//delete user
+	//soft delete user
 	@Operation(
-			summary = "delete user",
-			description = "admin functionality to delete a user"
+			summary = "soft delete user(makes user status = INACTIVE",
+			description = "admin functionality to soft-delete a user"
 			)
-	@DeleteMapping("/{userId}")
-	public ResponseEntity<ApiResponse<String>> deleteUser(@PathVariable Long userId){
+	@DeleteMapping("/{userId}/soft-delete")
+	public ResponseEntity<ApiResponse<String>> softDeleteUser(@PathVariable Long userId){
 		userService.softDeleteUser(userId);
-		ApiResponse<String> response = ApiResponse.success("User deleted succesfully", null);
+		ApiResponse<String> response = ApiResponse.success("User made INACTIVE successfully", null);
 		return ResponseEntity.ok(response);
-	}//deleteUser() ends
+	}//softDeleteUser() ends
+
+	//hard delete user(permanent deletion)
+	@Operation(
+			summary = "permanently delete user",
+			description = "admin functionality to hard-delete a user"
+			)
+	@DeleteMapping("/{userId}/hard-delete")
+	public ResponseEntity<ApiResponse<String>> hardDeleteUser(@PathVariable Long userId){
+		userService.hardDeleteUser(userId);
+		ApiResponse<String> response = ApiResponse.success("User permanently deleted successfully", null);
+		return ResponseEntity.ok(response);
+	}//hardDeleteUser() ends
+
+	@PatchMapping("/{userId}/role")
+	public ResponseEntity<ApiResponse<UserResponseDto>> changeUserRole(
+			@PathVariable Long userId,
+			@RequestParam UserRole role //customer, admin
+			){
+		UserResponseDto user = userService.changeUserRole(userId, role);
+		ApiResponse<UserResponseDto> response = ApiResponse.success("User role updated sucessfully", user);
+		return ResponseEntity.ok(response);
+	}//changeUserRole() ends
 
 	
 	

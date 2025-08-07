@@ -1,136 +1,185 @@
-import React from "react";
-import {Link, useNavigate} from "react-router-dom";
-import {useEffect, useState} from "react";
-
+import React, { useEffect, useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import Categories from "../Dummy Data/Categories.js";
 
+// 🩸 MAIN REPAIR: Always get user from localStorage.
 function MyNavbar() {
-
-    const [loggedIn, setLoggedIn] = useState(false);
-    const navigate = useNavigate();
-    const [username, setUsername] = useState("");
-    const [search, setSearch] = useState("");
-
-    useEffect(() => {
-        setLoggedIn(localStorage.getItem("isLoggedIn") === "true");
-        setUsername(localStorage.getItem("username") || "");
-    }, []);
-
-    useEffect(() => {
-        setLoggedIn(localStorage.getItem("isLoggedIn") === "true");
-    }, []);
-
-
-    function handleLogout() {
-        localStorage.removeItem("isLoggedIn");
-        localStorage.removeItem("username");
-        setLoggedIn(false);
-        setUsername("");
-        navigate("/login");
+  const [user, setUser] = useState(() => {
+    // Parse the user object once on mount—never trust legacy state.
+    try {
+      return JSON.parse(localStorage.getItem("user"));
+    } catch {
+      return null;
     }
+  });
 
+  const navigate = useNavigate();
+  const [search, setSearch] = useState("");
 
-    return (
-        <nav className="navbar navbar-expand-lg bg-body-tertiary">
-            <div className="container-fluid">
-                <Link className="nav-link active" aria-current="page" to="/homepage"><strong> 🛒 ApnaCart</strong></Link>
-                <button className="navbar-toggler" type="button" data-bs-toggle="collapse"
-                        data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span className="navbar-toggler-icon"></span>
-                </button>
-                <div className="collapse navbar-collapse" id="navbarSupportedContent">
-                    <ul className="navbar-nav me-auto mb-2 mb-lg-0">
-                        <li className="nav-item">
-                            <Link className="nav-link active" aria-current="page" to="/homepage">Home</Link>
-                        </li>
-                        <li className="nav-item dropdown">
-                            <a className="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown"
-                               aria-expanded="false">
-                                Categories
-                            </a>
-                            <ul className="dropdown-menu">
-                                {Categories.map(cat => (
-                                    <li key={cat.id}>
-                                        <Link
-                                            className="dropdown-item"
-                                            to={`/category/${cat.name}`}
-                                        >
-                                            {cat.name}
-                                        </Link>
+  // 🛠️ Keep navbar state in sync with login/logout,
+  // even if user logs in/out in another tab or window.
+  useEffect(() => {
+    const handleStorageChange = () => {
+      try {
+        setUser(JSON.parse(localStorage.getItem("user")));
+      } catch {
+        setUser(null);
+      }
+    };
+    window.addEventListener("storage", handleStorageChange);
+    // Run once on mount
+    handleStorageChange();
+    return () => window.removeEventListener("storage", handleStorageChange);
+  }, []);
 
-                                    </li>
-                                ))}
-                                <li>
-                                    <hr className="dropdown-divider"/>
-                                </li>
-                                <li><a className="dropdown-item" href="#">View All Categories</a></li>
-                            </ul>
-                        </li>
-                    </ul>
-                    <form
-                        className="d-flex"
-                        role="search"
-                        onSubmit={e => {
-                            e.preventDefault();
-                            // Defensive: Don't search for empty string
-                            if (search.trim()) {
-                                navigate(`/search?q=${encodeURIComponent(search.trim())}`);
-                            }
-                        }}
+  // 👿 Legacy "isLoggedIn" squashed forever; user is the only source of truth.
+
+  function handleLogout() {
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    localStorage.setItem("isLoggedIn", "false"); // For any old code, set to false.
+    setUser(null);
+    navigate("/login");
+  }
+
+  return (
+    <nav className="navbar navbar-expand-lg bg-body-tertiary">
+      <div className="container-fluid">
+        <Link className="nav-link active" aria-current="page" to="/">
+          <strong> 🛒 ApnaCart</strong>
+        </Link>
+        <button
+          className="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarSupportedContent"
+          aria-controls="navbarSupportedContent"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <span className="navbar-toggler-icon"></span>
+        </button>
+        <div className="collapse navbar-collapse" id="navbarSupportedContent">
+          <ul className="navbar-nav me-auto mb-2 mb-lg-0">
+            <li className="nav-item">
+              <Link
+                className="nav-link active"
+                aria-current="page"
+                to="/"
+              >
+                Home
+              </Link>
+            </li>
+            <li className="nav-item dropdown">
+              <a
+                className="nav-link dropdown-toggle"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+                aria-expanded="false"
+              >
+                Categories
+              </a>
+              <ul className="dropdown-menu">
+                {Categories.map((cat) => (
+                  <li key={cat.id}>
+                    <Link
+                      className="dropdown-item"
+                      to={`/category/${cat.name}`}
                     >
-                        <input
-                            className="form-control me-2"
-                            type="search"
-                            placeholder="Search"
-                            aria-label="Search"
-                            value={search}
-                            onChange={e => setSearch(e.target.value)}
-                        />
-                        <button className="btn btn-outline-success m-2" type="submit">
-                            Search
-                        </button>
-                    </form>
+                      {cat.name}
+                    </Link>
+                  </li>
+                ))}
+                <li>
+                  <hr className="dropdown-divider" />
+                </li>
+                <li>
+                  <a className="dropdown-item" href="#">
+                    View All Categories
+                  </a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+          <form
+            className="d-flex"
+            role="search"
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (search.trim()) {
+                navigate(`/search?q=${encodeURIComponent(search.trim())}`);
+              }
+            }}
+          >
+            <input
+              className="form-control me-2"
+              type="search"
+              placeholder="Search"
+              aria-label="Search"
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+            />
+            <button className="btn btn-outline-success m-2" type="submit">
+              Search
+            </button>
+          </form>
 
-                    <ul className="navbar-nav">
-
-                        <ul className="navbar-nav">
-                            {loggedIn ? (
-                                <>
-                                    <li className="nav-item d-flex align-items-center">
-                                        <Link
-                                            to="/profile"
-                                            className="navbar-text me-2 text-primary fw-bold text-decoration-none"
-                                            style={{fontSize: "1rem", cursor: "pointer"}}
-                                        >
-                                            <i className="bi bi-person-circle me-1"></i>
-                                            {username}
-                                        </Link>
-                                        <button className="btn btn-danger btn-sm me-2 m-auto" onClick={handleLogout}>
-                                            Logout
-                                        </button>
-                                    </li>
-
-                                </>
-                            ) : (
-                                <>
-                                    <li className="nav-item">
-                                        <Link className="btn btn-outline-primary btn-sm me-2 m-auto"
-                                              to="/login">Login</Link>
-                                    </li>
-                                    <li className="nav-item">
-                                        <Link className="btn btn-outline-primary btn-sm me-2 m-auto" to="/signup">Sign
-                                            up</Link>
-                                    </li>
-                                </>
-                            )}
-                        </ul>
-
-                    </ul>
-                </div>
-            </div>
-        </nav>
-    )
+          <ul className="navbar-nav">
+            {/* --- THE LOGIC YOU CRAVE --- */}
+            {user ? (
+              <>
+                <li className="nav-item d-flex align-items-center">
+                  <Link
+                    to="/profile"
+                    className="navbar-text me-2 text-primary fw-bold text-decoration-none"
+                    style={{ fontSize: "1rem", cursor: "pointer" }}
+                  >
+                    <i className="bi bi-person-circle me-1"></i>
+                    {user.userName}
+                  </Link>
+                  {/* Show Admin Panel link if and only if user is ADMIN */}
+                  {user.userRole === "ADMIN" && (
+                    <Link
+                      to="/admin"
+                      className="btn btn-warning btn-sm me-2 m-auto"
+                    >
+                      Admin Panel
+                    </Link>
+                  )}
+                  <button
+                    className="btn btn-danger btn-sm me-2 m-auto"
+                    onClick={handleLogout}
+                  >
+                    Logout
+                  </button>
+                </li>
+              </>
+            ) : (
+              <>
+                <li className="nav-item">
+                  <Link
+                    className="btn btn-outline-primary btn-sm me-2 m-auto"
+                    to="/login"
+                  >
+                    Login
+                  </Link>
+                </li>
+                <li className="nav-item">
+                  <Link
+                    className="btn btn-outline-primary btn-sm me-2 m-auto"
+                    to="/register"
+                  >
+                    Sign up
+                  </Link>
+                </li>
+              </>
+            )}
+          </ul>
+        </div>
+      </div>
+    </nav>
+  );
 }
 
 export default MyNavbar;

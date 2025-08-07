@@ -31,4 +31,5 @@ public class ProductRequestDto {
     @NotNull(message = "Subcategory ID is required")
     private Long subCategoryId;
     
+
 }

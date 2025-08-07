@@ -3,6 +3,7 @@ package com.apnacart.service.impl;
 
 import java.util.List;
 
+import com.apnacart.entity.UserRole;
 import com.apnacart.exception.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -63,14 +64,14 @@ public class UserServiceImpl implements UserService {
 	}//isMobileNoAvailable() ends
 	
 	@Override
-	public void deleteUser(Long userId) {
+	public void hardDeleteUser(Long userId) {
 		//check if user already exists or not
 		if(!userDao.existsById(userId)) {
 			throw new ResourceNotFoundException("No such user with id : " + userId);
 		}
 		userDao.deleteById(userId);
 
-	}//deleteUser() ends
+	}//hardDeleteUser() ends
 
 	@Override
 	public UserResponseDto changeUserStatus(Long userId, UserStatus status) {
@@ -125,7 +126,7 @@ public class UserServiceImpl implements UserService {
 	}//registerUser() ends
 
 	
-	// //new dto based update method
+
 	@Override
 	public UserResponseDto updateUser(Long userId, UserUpdateDto updateDto) {
 		
@@ -171,6 +172,17 @@ public class UserServiceImpl implements UserService {
 				.map(userMapper::toResponseDto)
 				.toList();
 	}//getAllUserResponses() ends
+
+	/**
+	 * @return users of all types
+	 */
+	@Override
+	public List<UserResponseDto> getAllUsers() {
+		return userDao.findAll()
+				.stream()
+				.map(userMapper::toResponseDto)
+				.toList();
+	}//getAllUsers() ends
 
 	@Override
 	public AuthenticationResponseDto authenticateUser(UserLoginDto loginDto) {
@@ -233,5 +245,22 @@ public class UserServiceImpl implements UserService {
 		user.setStatus(UserStatus.ACTIVE);
 		userDao.save(user);
 	}//reactivateUser() ends
-	
+
+	/**
+	 * @param userId
+	 * @param role
+	 * @return UserResponseDto
+	 */
+	@Override
+	public UserResponseDto changeUserRole(Long userId, UserRole role) {
+		//fetch user by id
+		User user = getUserById(userId);
+		//set the new role
+		user.setRole(role);
+		//save the changes
+		User updatedUser = userDao.save(user);
+		return userMapper.toResponseDto(updatedUser);
+	}//changeUserRole() ends
+
+
 }//UserServiceImpl ends
