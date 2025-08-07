@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import Categories from "../Dummy Data/Categories.js";
+import Categories from "../dummy-data/Categories";
 
 // 🩸 MAIN REPAIR: Always get user from localStorage.
 function MyNavbar() {

@@ -4,7 +4,7 @@ import { useParams } from "react-router-dom";
 import MyNavbar from "../components/MyNavbar";
 import Product from "../components/Product";
 import Footer from "../components/Footer";
-import products from "../Dummy Data/products.js";
+import products from "../dummy-data/products";
 
 function CategoryPage() {
     const { name } = useParams(); // get "Fashion & Apparel" or whatever from URL

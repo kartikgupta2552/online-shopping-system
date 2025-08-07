@@ -2,7 +2,7 @@ import React from "react";
 import { useLocation } from "react-router-dom";
 import MyNavbar from "../components/MyNavbar";
 import Footer from "../components/Footer";
-import products from "../Dummy Data/products.js";
+import products from "../dummy-data/products";
 import Product from "../components/Product";
 
 
