@@ -1,9 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import Categories from "../Dummy Data/Categories.js";
+import { getAllCategories } from "../api/categoryApi";
 
 // 🩸 MAIN REPAIR: Always get user from localStorage.
 function MyNavbar() {
+
   const [user, setUser] = useState(() => {
     // Parse the user object once on mount—never trust legacy state.
     try {
@@ -15,10 +16,12 @@ function MyNavbar() {
 
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
+  const [categories, setCategories] = useState([])
 
   // 🛠️ Keep navbar state in sync with login/logout,
   // even if user logs in/out in another tab or window.
   useEffect(() => {
+    fetchData()
     const handleStorageChange = () => {
       try {
         setUser(JSON.parse(localStorage.getItem("user")));
@@ -31,6 +34,16 @@ function MyNavbar() {
     handleStorageChange();
     return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
+
+  const fetchData = async () => {
+    try{
+      const categoryData = await getAllCategories()
+      setCategories(categoryData.data)
+    }
+    catch(error){
+      console.log("Error fetching data:", error)
+    }
+  }
 
   // 👿 Legacy "isLoggedIn" squashed forever; user is the only source of truth.
 
@@ -62,11 +75,7 @@ function MyNavbar() {
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
           <ul className="navbar-nav me-auto mb-2 mb-lg-0">
             <li className="nav-item">
-              <Link
-                className="nav-link active"
-                aria-current="page"
-                to="/"
-              >
+              <Link className="nav-link active" aria-current="page" to="/">
                 Home
               </Link>
             </li>
@@ -81,13 +90,13 @@ function MyNavbar() {
                 Categories
               </a>
               <ul className="dropdown-menu">
-                {Categories.map((cat) => (
-                  <li key={cat.id}>
+                {categories.map((cat) => (
+                  <li key={cat.categoryId}>
                     <Link
                       className="dropdown-item"
-                      to={`/category/${cat.name}`}
+                      to={`/category/${cat.categoryName}`}
                     >
-                      {cat.name}
+                      {cat.categoryName}
                     </Link>
                   </li>
                 ))}
