@@ -7,7 +7,7 @@ import { Link, useNavigate } from "react-router-dom";
 const API_URL = "http://localhost:8080/api/users/register";
 
 import axios from 'axios';
-import { Link } from "react-router-dom";
+
 import BASE_URL from "../api/apiConfig";
 
 
