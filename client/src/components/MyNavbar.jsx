@@ -4,7 +4,6 @@ import { getAllCategories } from "../api/categoryApi";
 
 // 🩸 MAIN REPAIR: Always get user from localStorage.
 function MyNavbar() {
-
   const [user, setUser] = useState(() => {
     // Parse the user object once on mount—never trust legacy state.
     try {
@@ -16,12 +15,13 @@ function MyNavbar() {
 
   const navigate = useNavigate();
   const [search, setSearch] = useState("");
-  const [categories, setCategories] = useState([])
+  const [categories, setCategories] = useState([]);
 
   // 🛠️ Keep navbar state in sync with login/logout,
   // even if user logs in/out in another tab or window.
   useEffect(() => {
-    fetchData()
+    fetchCategoryData();
+
     const handleStorageChange = () => {
       try {
         setUser(JSON.parse(localStorage.getItem("user")));
@@ -35,15 +35,14 @@ function MyNavbar() {
     return () => window.removeEventListener("storage", handleStorageChange);
   }, []);
 
-  const fetchData = async () => {
-    try{
-      const categoryData = await getAllCategories()
-      setCategories(categoryData.data)
+  const fetchCategoryData = async () => {
+    try {
+      const categoryData = await getAllCategories();
+      setCategories(categoryData.data);
+    } catch (error) {
+      console.log("Error fetching data:", error);
     }
-    catch(error){
-      console.log("Error fetching data:", error)
-    }
-  }
+  };
 
   // 👿 Legacy "isLoggedIn" squashed forever; user is the only source of truth.
 
@@ -95,6 +94,7 @@ function MyNavbar() {
                     <Link
                       className="dropdown-item"
                       to={`/category/${cat.categoryName}`}
+                      state={{categoryId : cat.categoryId}}
                     >
                       {cat.categoryName}
                     </Link>

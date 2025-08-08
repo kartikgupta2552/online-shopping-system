@@ -1,51 +1,60 @@
 // src/pages/CategoryPage.jsx
-import React from "react";
-import { useParams } from "react-router-dom";
+import React, { useEffect, useState } from "react";
+import { useLocation, useParams } from "react-router-dom";
 import MyNavbar from "../components/MyNavbar";
 import Product from "../components/Product";
 import Footer from "../components/Footer";
-import products from "../Dummy Data/products.js";
+import { getProductByCategoryId } from "../api/productApi.js";
 
 function CategoryPage() {
-    const { name } = useParams(); // get "Fashion & Apparel" or whatever from URL
-    const productsForCategory = products.filter(
-        (p) => p.category === name
-    );
-    const displayName = name;
+  const { categoryName } = useParams(); // get "Fashion & Apparel" or whatever from URL
+  const location = useLocation();
+  const categoryId = location.state?.categoryId;
+  const [products, setProducts] = useState([]);
 
-    if (!productsForCategory.length) {
-        return (
-            <>
-                <MyNavbar />
-                <div className="container text-center my-5">
-                    <h2>No products found for "{displayName}"</h2>
-                </div>
-                <Footer />
-            </>
-        );
+  useEffect(() => {
+    fetchProductsByCategory();
+  }, [categoryName]);
+
+  const fetchProductsByCategory = async () => {
+    try {
+      const response = await getProductByCategoryId(categoryId);
+      setProducts(response.data);
+      console.log(response.data);
+      console.log(categoryId);
+    } catch (error) {
+      console.log("Error fetching data:", error);
     }
+  };
 
-    return (
-        <>
-            <MyNavbar />
-            <div className="container">
-                <h2>{displayName}</h2>
-                <div className="row">
-                    {productsForCategory.map((p) => (
-                        <div className="col-md-3" key={p.id}>
-                            <Product
-                                title={p.title}
-                                description={p.description}
-                                image={p.image}
-                                price={p.price}
-                            />
-                        </div>
-                    ))}
-                </div>
-            </div>
-            <Footer />
-        </>
-    );
+  return (
+    <>
+      <MyNavbar />
+      {!products.length ? (
+        <div className="container text-center my-5">
+          <h2>No products found for "{categoryName}"</h2>
+        </div>
+      ) : (
+        <div className="container">
+          <h2>{categoryName}</h2>
+          <div className="row">
+            {products.map((p) => (
+              <div className="col-md-3" key={p.productId}>
+                <Product
+                  title={p.productName}
+                  description={p.description}
+                  image={p.imagePath}
+                  price={p.price}
+                />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      <Footer />
+    </>
+  );
 }
 
 export default CategoryPage;
