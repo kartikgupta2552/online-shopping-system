@@ -37,7 +37,7 @@ public class GlobalExceptionHandler {
 			errors.put(fieldName, errorMessage);
 		});
 		
-		ApiResponse<Void> response = ApiResponse.error("validation failed!",errors);
+		// ApiResponse<Void> response = ApiResponse.error("validation failed!",errors);
 		//response.setData(errors);
 		return ResponseEntity.badRequest().body(ApiResponse.<Void>error("validation failed!", errors));
 		//
@@ -134,7 +134,7 @@ public class GlobalExceptionHandler {
 	public ResponseEntity<ApiResponse<Void>> handleIOException(IOException ex){
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ApiResponse.error("File operation failed", ex.getMessage()));
 	}//handleIOException() ends
-	
+
 	//handle all other runtime exceptions
 	@ExceptionHandler(RuntimeException.class)
 	public ResponseEntity<ApiResponse<Void>> handleRuntimeException(RuntimeException ex){
