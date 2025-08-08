@@ -23,6 +23,8 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestParam;
+
 
 
 
@@ -41,7 +43,7 @@ public class ProductController {
         ProductResponseDto responseDto = productService.createProduct(dto,imageFile);
         return new ResponseEntity<>(ApiResponse.success("Product added successfully", responseDto), HttpStatus.CREATED);
     }
-
+    
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<ProductResponseDto>> getProductById(@PathVariable("id") Long id) {
         ProductResponseDto responseDto = productService.getProductById(id);
@@ -55,10 +57,10 @@ public class ProductController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<ApiResponse<ProductResponseDto>> updateProduct(@PathVariable("id") Long id,
-                                                                         @RequestPart("product") @Valid ProductRequestDto requestDto,
-                                                                         @RequestPart(value = "image", required = false) MultipartFile imageFile
-    ) throws IOException{
+    public ResponseEntity<ApiResponse<ProductResponseDto>> updateProduct(@PathVariable("id") Long id, 
+        @RequestPart("product") @Valid ProductRequestDto requestDto,
+        @RequestPart(value = "image", required = false) MultipartFile imageFile
+        ) throws IOException{
         ProductResponseDto responseDto = productService.updateProduct(id, requestDto, imageFile);
         return ResponseEntity.ok(ApiResponse.success("Product updated successfully", responseDto));
     }
@@ -69,4 +71,12 @@ public class ProductController {
         return ResponseEntity.ok(ApiResponse.success("Product deleted successfully", null));
     }
 
-}//ProductController ends
+    @GetMapping("/category/{categoryId}")
+    public ResponseEntity<ApiResponse<List<ProductResponseDto>>> getProductsByCategory(@PathVariable("categoryId") Long categoryId){
+        List<ProductResponseDto> responseDtos = productService.getProductByCategoryId(categoryId);
+        return ResponseEntity.ok(ApiResponse.success("Product fetched successfully by Category", responseDtos));
+    }
+
+
+
+}

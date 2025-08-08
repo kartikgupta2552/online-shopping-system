@@ -1,4 +1,4 @@
-import { createBrowserRouter , RouterProvider } from "react-router-dom";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import ItemDetailsPage from "./pages/ItemDetailsPage";
@@ -25,56 +25,54 @@ import Products from "./admin/pages/Products";
 import Orders from "./admin/pages/Orders";
 import Categories from "./admin/pages/Categories";
 import "bootstrap-icons/font/bootstrap-icons.css";
-import { CartProvider } from './context/CartContext';
+import { CartProvider } from "./context/CartContext";
 
+const router = createBrowserRouter([
+  { path: "/", element: <HomePage /> },
+  // {path: "/admin", element: (
+  //   <ProtectedAdminRoute>
+  //     <AdminDashboard />
+  //   </ProtectedAdminRoute>
+  // )},
+  {
+    path: "/admin",
+    element: (
+      <ProtectedAdminRoute>
+        <AdminShell />
+      </ProtectedAdminRoute>
+    ),
+    children: [
+      { path: "", element: <AdminDashboard /> }, // /admin
+      { path: "users", element: <Users /> }, // /admin/users
+      { path: "products", element: <Products /> }, // /admin/products
+      { path: "orders", element: <Orders /> }, // /admin/orders
+      { path: "categories", element: <Categories /> }, // /admin/categories
+    ],
+  },
+  { path: "/register", element: <Register /> },
 
+  { path: "/login", element: <Login /> },
+  { path: "/cart", element: <Cart /> },
+  // {path: "/wishList", element: <WishList />},
 
-const router = createBrowserRouter(
-    [
-      
-      {path: "/", element: <HomePage />},
-      // {path: "/admin", element: (
-      //   <ProtectedAdminRoute>
-      //     <AdminDashboard />
-      //   </ProtectedAdminRoute>
-      // )},
-      {path: "/admin", element: (
-        <ProtectedAdminRoute>
-          <AdminShell />
-        </ProtectedAdminRoute>
-      ),
-      children : [
-        { path: "", element: <AdminDashboard /> },       // /admin
-    { path: "users", element: <Users /> },           // /admin/users
-    { path: "products", element: <Products /> },     // /admin/products
-    { path: "orders", element: <Orders /> },         // /admin/orders
-    { path: "categories", element: <Categories /> }, // /admin/categories
-      ]
-    },
-      {path: "/register", element: <Register />},
+  { path: "/itemDetailsPage", element: <ItemDetailsPage /> },
+  { path: "/cart", element: <Cart /> },
+  { path: "/payment", element: <Payment /> },
+  { path: "/", element: <HomePage /> },
+  { path: "/category/:categoryName", element: <CategoryPage /> },
+  { path: "/search", element: <SearchResultsPage /> },
+  { path: "/orderHistory", element: <OrderHistory /> },
+  { path: "/invoicePage", element: <InvoicePage /> },
+]);
 
-      {path:"/login",element:<Login />},
-      {path: "/cart", element: <Cart />},
-      // {path: "/wishList", element: <WishList />},
+const App = () => {
+  return (
+    <div>
+      <CartProvider>
+        <RouterProvider router={router} />
+      </CartProvider>
+    </div>
+  );
+};
 
-      {path: "/itemDetailsPage", element: <ItemDetailsPage />},
-      {path: "/cart", element: <Cart />},
-      {path: "/payment", element: <Payment />},
-      {path: "/", element: <HomePage/>},
-      {path: "/category/:name",element:<CategoryPage/>},
-      {path: "/search", element:<SearchResultsPage/>},
-      {path: "/orderHistory", element:<OrderHistory/>},
-      {path:"/invoicePage",element:<InvoicePage/>}
-
-    ]
-  )
-
- const App = () => {
-  return <div>
-    <CartProvider>
-      <RouterProvider router={router} />
-    </CartProvider>
-  </div>
-}
-
- export default App
+export default App;

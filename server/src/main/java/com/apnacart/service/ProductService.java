@@ -20,4 +20,8 @@ public interface ProductService {
 
     void deleteProduct(Long productId) throws IOException;
 
+    List<ProductResponseDto> getProductByCategoryId(Long categoryId);
+
+}
+
 }//ProductService interface ends
