@@ -3,7 +3,7 @@ import MyNavbar from "../components/MyNavbar.jsx";
 import Product from "../components/Product.jsx";
 import Footer from "../components/Footer.jsx";
 import categories from "../dummy-data/Categories.js";
-import products from "../Dummy Data/products.js";
+import products from "../dummy-data/products.js";
 import { useLocation, useNavigate } from "react-router-dom";
 
 function HomePage() {
