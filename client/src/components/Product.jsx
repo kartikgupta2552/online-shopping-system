@@ -12,6 +12,7 @@ function isLoggedIn() {
 }
 
 function Product({ id, title, description, image, price, ...rest }) {
+  const BASE_URL = import.meta.env.VITE_API_BASE_URL
   const navigate = useNavigate();
   const { addToCart, addToWishlist } = useContext(CartContext);
 
@@ -49,7 +50,7 @@ function Product({ id, title, description, image, price, ...rest }) {
   return (
     <div className="card m-1 mb-2 border border-black product-card h-100">
       <img
-        src={image}
+        src={`${BASE_URL}${image}`}
         className="card-img-top product-card-img"
         alt={title}
         style={{ height: "180px", objectFit: "cover" }}
