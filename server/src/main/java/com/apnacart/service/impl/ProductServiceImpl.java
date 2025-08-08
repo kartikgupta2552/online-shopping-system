@@ -158,4 +158,18 @@ public class ProductServiceImpl implements ProductService{
         productDao.deleteById(productId);
     }
 
+    @Override
+    public List<ProductResponseDto> getProductByCategoryId(Long categoryId) {
+        List<Product> products = productDao.findBySubCategory_Category_CategoryId(categoryId);
+        List<ProductResponseDto> responseDtos = new ArrayList<>();
+        products.forEach(product -> {
+            ProductResponseDto responseDto = modelMapper.map(product, ProductResponseDto.class);
+            responseDto.setSubCategoryId(product.getSubCategory().getSubCategoryId());
+            responseDtos.add(responseDto);
+        });
+        
+        return responseDtos;
+
+    }
+
 }

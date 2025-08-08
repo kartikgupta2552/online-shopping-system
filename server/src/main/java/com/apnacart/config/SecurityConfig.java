@@ -40,9 +40,17 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // public endpoints(no authentication required)
                         //login and registration
+
+
+                        .requestMatchers("**").permitAll() // need to remove
+
+
+                        
                         .requestMatchers("/api/users/register", "/api/users/login").permitAll()
                         // Browsing category/subcategory
                         .requestMatchers(HttpMethod.GET, "/category/**", "/subcategory/**").permitAll()
+                        // Allow See Product
+                        .requestMatchers(HttpMethod.GET, "product/**").permitAll()
                         // Allow public images (optional)
                         .requestMatchers("/image/product/**").permitAll()
                         // --- Admin ONLY endpoints ---
