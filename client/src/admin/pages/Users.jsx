@@ -13,32 +13,17 @@ import DialogActions from "@mui/material/DialogActions";
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import MenuItem from "@mui/material/MenuItem";
+import AddIcon from "@mui/icons-material/Add";
+import userApi from "../../api/userApi";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
 
 const deleteUserApi = async (userId, token) => {
-  try {
-    const res = await axios.delete(
-      `http://localhost:8080/api/users/${userId}/hard-delete`,
-      {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      }
-    );
-    return res.data;
-  } catch (error) {
-    throw error;
-  }
+  return userApi.delete(userId, token);
 };
 
 const updateUserApi = async (userId, updateData, token) => {
-  try {
-    const res = await axios.put(
-      `http://localhost:8080/api/users/${userId}/profile`,
-      updateData,
-      { headers: token ? { Authorization: `Bearer ${token}` } : {} }
-    );
-    return res.data;
-  } catch (error) {
-    throw error;
-  }
+  return userApi.update(userId, updateData, token);
 };
 
 const Users = () => {
@@ -48,6 +33,8 @@ const Users = () => {
   const [openEdit, setOpenEdit] = useState(false);
   const [openDelete, setOpenDelete] = useState(false);
   const [selectedUser, setSelectedUser] = useState(null);
+  const [snackOpen, setSnackOpen] = useState(false);
+  const [snackMsg, setSnackMsg] = useState("");
 
   const [editUserFields, setEditUserFields] = useState({
     userName: "",
@@ -59,6 +46,45 @@ const Users = () => {
   });
 
   const [editUserErrors, setEditUserErrors] = useState({});
+  const [addUserFields, setAddUserFields] = useState({
+    userName: "",
+    email: "",
+    password: "",
+    confirmPassword: "", // Added for password confirmation
+    mobileNo: "",
+    address: "",
+  });
+  const [addUserErrors, setAddUserErrors] = useState({});
+  const [addUserLoading, setAddUserLoading] = useState(false);
+  const [addUserServerError, setAddUserServerError] = useState("");
+  const [openAdd, setOpenAdd] = useState(false);
+
+  const validateAddUserFields = (fields) => {
+    const errors = {};
+    if (!fields.userName || fields.userName.trim().length < 2)
+      errors.userName = "Name must be at least 2 characters.";
+    if (!fields.email) errors.email = "Email is required.";
+    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fields.email))
+      errors.email = "Invalid email address.";
+    if (!fields.password) errors.password = "Password is required.";
+    else if (fields.password.length < 8)
+      errors.password = "Password must be at least 8 characters.";
+    else if (
+      !/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])/.test(fields.password)
+    )
+      errors.password =
+        "Password must contain uppercase, lowercase, number, and special character.";
+    if (!fields.confirmPassword)
+      errors.confirmPassword = "Confirm your password.";
+    else if (fields.password !== fields.confirmPassword)
+      errors.confirmPassword = "Passwords do not match.";
+    if (!fields.mobileNo) errors.mobileNo = "Mobile number is required.";
+    else if (!/^[6-9]\d{9}$/.test(fields.mobileNo))
+      errors.mobileNo = "Enter valid 10-digit Indian mobile number.";
+    if (fields.address && fields.address.length > 500)
+      errors.address = "Address must be under 500 characters.";
+    return errors;
+  };
 
   // Sane field validation for every admin use-case
   const validateEditFields = (fields) => {
@@ -197,27 +223,27 @@ const Users = () => {
     },
   ];
 
+  const loadUsers = async () => {
+    try {
+      setLoading(true);
+      const token = localStorage.getItem("token");
+      const res = await userApi.getAllUsers(token);
+      setRows(res.data.data);
+      setLoading(false);
+    } catch (err) {
+      console.error("Failed to fetch users:", err);
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchUsers = async () => {
-      try {
-        setLoading(true);
-        const token = localStorage.getItem("token");
-        const res = await axios.get("http://localhost:8080/api/users/all", {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        });
-        setRows(res.data.data);
-        setLoading(false);
-      } catch (err) {
-        console.error("Failed to fetch users:", err);
-        setLoading(false);
-      }
-    };
-    fetchUsers();
+    loadUsers();
   }, []);
 
   return (
     <Box
       sx={{
+        position: "relative", //for absolute positioning of add user button
         height: "calc(100vh - 120px)",
         width: "100%",
         maxWidth: "100vw",
@@ -229,6 +255,15 @@ const Users = () => {
         overflowX: "auto",
       }}
     >
+      <Button
+        variant="contained"
+        color="primary"
+        startIcon={<AddIcon />}
+        sx={{ position: "absolute", right: 32, top: 24, zIndex: 2 }}
+        onClick={() => setOpenAdd(true)}
+      >
+        Add user
+      </Button>
       <h2 style={{ marginTop: 0 }}>Users</h2>
       <DataGrid
         rows={rows}
@@ -398,6 +433,8 @@ const Users = () => {
                       : row
                   )
                 );
+                setSnackMsg("User updated successfully!");
+                setSnackOpen(true);
                 setOpenEdit(false);
               } catch (e) {
                 // Here’s the server-side handling!
@@ -443,6 +480,8 @@ const Users = () => {
                   prev.filter((row) => row.userId !== selectedUser.userId)
                 );
                 setOpenDelete(false);
+                setSnackMsg("User deleted successfully!");
+                setSnackOpen(true);
               } catch (err) {
                 alert(
                   "Delete failed: " +
@@ -457,6 +496,158 @@ const Users = () => {
           </Button>
         </DialogActions>
       </Dialog>
+      <Dialog open={openAdd} onClose={() => setOpenAdd(false)}>
+        <DialogTitle>Add New User</DialogTitle>
+        <DialogContent>
+          {addUserServerError && (
+            <div style={{ color: "red", marginBottom: 8 }}>
+              {addUserServerError}
+            </div>
+          )}
+          <TextField
+            margin="dense"
+            label="Name"
+            value={addUserFields.userName}
+            error={!!addUserErrors.userName}
+            helperText={addUserErrors.userName}
+            onChange={(e) =>
+              setAddUserFields((f) => ({ ...f, userName: e.target.value }))
+            }
+            fullWidth
+          />
+          <TextField
+            margin="dense"
+            label="Email"
+            value={addUserFields.email}
+            error={!!addUserErrors.email}
+            helperText={addUserErrors.email}
+            onChange={(e) =>
+              setAddUserFields((f) => ({ ...f, email: e.target.value }))
+            }
+            fullWidth
+          />
+          <TextField
+            margin="dense"
+            label="Password"
+            type="password"
+            value={addUserFields.password}
+            error={!!addUserErrors.password}
+            helperText={addUserErrors.password}
+            onChange={(e) =>
+              setAddUserFields((f) => ({ ...f, password: e.target.value }))
+            }
+            fullWidth
+          />
+          <TextField
+            margin="dense"
+            label="Confirm Password"
+            type="password"
+            value={addUserFields.confirmPassword}
+            error={!!addUserErrors.confirmPassword}
+            helperText={addUserErrors.confirmPassword}
+            onChange={(e) =>
+              setAddUserFields((f) => ({
+                ...f,
+                confirmPassword: e.target.value,
+              }))
+            }
+            fullWidth
+          />
+          <TextField
+            margin="dense"
+            label="Mobile Number"
+            value={addUserFields.mobileNo}
+            error={!!addUserErrors.mobileNo}
+            helperText={addUserErrors.mobileNo}
+            onChange={(e) =>
+              setAddUserFields((f) => ({ ...f, mobileNo: e.target.value }))
+            }
+            fullWidth
+          />
+          <TextField
+            margin="dense"
+            label="Address"
+            value={addUserFields.address}
+            error={!!addUserErrors.address}
+            helperText={addUserErrors.address}
+            onChange={(e) =>
+              setAddUserFields((f) => ({ ...f, address: e.target.value }))
+            }
+            fullWidth
+            multiline
+            minRows={2}
+          />
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={() => setOpenAdd(false)} color="secondary">
+            Cancel
+          </Button>
+          <Button
+            variant="contained"
+            color="primary"
+            disabled={addUserLoading}
+            onClick={async () => {
+              setAddUserServerError("");
+              const errs = validateAddUserFields(addUserFields);
+              setAddUserErrors(errs);
+              if (Object.keys(errs).length > 0) return;
+              setAddUserLoading(true);
+              try {
+                await userApi.register({
+                  userName: addUserFields.userName,
+                  email: addUserFields.email,
+                  password: addUserFields.password,
+                  mobileNo: addUserFields.mobileNo,
+                  address: addUserFields.address,
+                });
+                setOpenAdd(false);
+                setAddUserFields({
+                  userName: "",
+                  email: "",
+                  password: "",
+                  confirmPassword: "",
+                  mobileNo: "",
+                  address: "",
+                });
+                setAddUserErrors({});
+                setAddUserLoading(false);
+                setSnackMsg("User added successfully!");
+                setSnackOpen(true);
+                // Reload users table
+                if (typeof loadUsers === "function") loadUsers();
+              } catch (err) {
+                setAddUserLoading(false);
+                if (
+                  err.response &&
+                  err.response.data &&
+                  err.response.data.message
+                ) {
+                  setAddUserServerError(err.response.data.message);
+                } else {
+                  setAddUserServerError("Failed to add user. Try again.");
+                }
+              }
+            }}
+          >
+            Add
+          </Button>
+        </DialogActions>
+      </Dialog>
+      <Snackbar
+        open={snackOpen}
+        autoHideDuration={3000}
+        onClose={() => setSnackOpen(false)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "center" }}
+      >
+        <MuiAlert
+          onClose={() => setSnackOpen(false)}
+          severity="success"
+          elevation={6}
+          variant="filled"
+        >
+          {snackMsg}
+        </MuiAlert>
+      </Snackbar>
     </Box>
   );
 };

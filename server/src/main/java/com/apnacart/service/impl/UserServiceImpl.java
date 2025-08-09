@@ -5,6 +5,7 @@ import java.util.List;
 
 import com.apnacart.entity.UserRole;
 import com.apnacart.exception.*;
+import com.apnacart.service.EmailService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -35,6 +36,7 @@ public class UserServiceImpl implements UserService {
 	private final UserMapper userMapper; //constructor injection -> @RequiredArgsConstructor
 	private final PasswordEncoder passwordEncoder; //constructor injection -> @RequiredArgsConstructor
 	private final JwtUtil jwtUtil; // constructor injection -> @RequiredArgsConstructor
+    private final EmailService emailService;
 
 	//private helper methods
 	@Transactional(readOnly = true)
@@ -119,6 +121,13 @@ public class UserServiceImpl implements UserService {
 		
 		//save user
 		User savedUser = userDao.save(user);
+
+        //send welcome email
+        try {
+            emailService.sendWelcomeMail(savedUser.getEmail(), savedUser.getUserName());
+        } catch (Exception e) {
+            System.err.println("Error sending welcome email : " + e.getMessage());
+        }
 		
 		//convert user entity to response dto
 		return userMapper.toResponseDto(savedUser);
