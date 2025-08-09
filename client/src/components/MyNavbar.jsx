@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { getAllCategories } from "../api/categoryApi";
+import categoryApi from "../api/categoryApi";
 
 // 🩸 MAIN REPAIR: Always get user from localStorage.
 function MyNavbar() {
@@ -37,10 +37,10 @@ function MyNavbar() {
 
   const fetchCategoryData = async () => {
     try {
-      const categoryData = await getAllCategories();
+      const categoryData = await categoryApi.getAllCategories();
       setCategories(categoryData.data);
     } catch (error) {
-      console.log("Error fetching data:", error);
+      console.log("Error fetching category data:", error);
     }
   };
 
@@ -81,7 +81,7 @@ function MyNavbar() {
             <li className="nav-item dropdown">
               <a
                 className="nav-link dropdown-toggle"
-                href="#"
+                // href="#"
                 role="button"
                 data-bs-toggle="dropdown"
                 aria-expanded="false"
@@ -94,30 +94,22 @@ function MyNavbar() {
                     <Link
                       className="dropdown-item"
                       to={`/category/${cat.categoryName}`}
-                      state={{categoryId : cat.categoryId}}
+                      state={{ categoryId: cat.categoryId }}
                     >
                       {cat.categoryName}
                     </Link>
                   </li>
                 ))}
-                <li>
-                  <hr className="dropdown-divider" />
-                </li>
-                <li>
-                  <a className="dropdown-item" href="#">
-                    View All Categories
-                  </a>
-                </li>
               </ul>
             </li>
           </ul>
           <form
-            className="d-flex"
+            className="d-flex mb-2"
             role="search"
             onSubmit={(e) => {
               e.preventDefault();
               if (search.trim()) {
-                navigate(`/search?q=${encodeURIComponent(search.trim())}`);
+                navigate(`/search?keyword=${encodeURIComponent(search.trim())}`);
               }
             }}
           >
@@ -166,7 +158,7 @@ function MyNavbar() {
               </>
             ) : (
               <>
-                <li className="nav-item">
+                <li className="nav-item mb-2">
                   <Link
                     className="btn btn-outline-primary btn-sm me-2 m-auto"
                     to="/login"

@@ -169,7 +169,19 @@ public class ProductServiceImpl implements ProductService{
         });
         
         return responseDtos;
+    }
 
+    @Override
+    public List<ProductResponseDto> searchProducts(String keyword) {
+        List<Product> products = productDao.findByProductNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(keyword, keyword);
+        List<ProductResponseDto> responseDtos = new ArrayList<>();
+        products.forEach(product -> {
+            ProductResponseDto responseDto = modelMapper.map(product, ProductResponseDto.class);
+            responseDto.setSubCategoryId(product.getSubCategory().getSubCategoryId());
+            responseDtos.add(responseDto);
+        });
+
+        return responseDtos;
     }
 
 }

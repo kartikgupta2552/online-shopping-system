@@ -4,7 +4,7 @@ import { useLocation, useParams } from "react-router-dom";
 import MyNavbar from "../components/MyNavbar";
 import Product from "../components/Product";
 import Footer from "../components/Footer";
-import { getProductByCategoryId } from "../api/productApi.js";
+import productApi from "../api/productApi";
 
 function CategoryPage() {
   const { categoryName } = useParams(); // get "Fashion & Apparel" or whatever from URL
@@ -18,7 +18,7 @@ function CategoryPage() {
 
   const fetchProductsByCategory = async () => {
     try {
-      const response = await getProductByCategoryId(categoryId);
+      const response = await productApi.getProductByCategoryId(categoryId);
       setProducts(response.data);
       console.log(response.data);
       console.log(categoryId);
@@ -35,7 +35,7 @@ function CategoryPage() {
           <h2>No products found for "{categoryName}"</h2>
         </div>
       ) : (
-        <div className="container">
+        <div className="container mb-4">
           <h2>{categoryName}</h2>
           <div className="row">
             {products.map((p) => (

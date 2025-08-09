@@ -22,4 +22,6 @@ public interface ProductService {
 
     List<ProductResponseDto> getProductByCategoryId(Long categoryId);
 
+    List<ProductResponseDto> searchProducts(String keyword);
+
 }
