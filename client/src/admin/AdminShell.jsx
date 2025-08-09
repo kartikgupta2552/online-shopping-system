@@ -21,6 +21,10 @@ import CategoryIcon from "@mui/icons-material/Category";
 // React Router for navigation
 import { Link, useLocation, Outlet } from "react-router-dom";
 
+//why use MUI datagrid?
+//use DataGrid from MUI for scalable tabular data, with interactions
+// via IconButtons and modals for edit/delete, powered by stateful React Hooks and REST API calls via Axios.
+
 // Sidebar navigation structure: Each with icon and label
 const sidebarItems = [
   {
@@ -59,7 +63,7 @@ const AdminShell = () => {
 
   // Sidebar as permanent drawer
   return (
-    <Box sx={{ display: "flex", minHeight: "100vh",flexGrow:1}}>
+    <Box sx={{ display: "flex", minHeight: "100vh", flexGrow: 1 }}>
       {/* Topbar */}
       <AppBar
         position="fixed"
@@ -147,7 +151,7 @@ const AdminShell = () => {
         sx={{
           flexGrow: 1,
           p: 1,
-          m:`1px` ,
+          m: `1px`,
           bgcolor: "#f7f8fa",
           minHeight: "100vh",
         }}

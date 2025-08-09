@@ -22,6 +22,4 @@ public interface ProductService {
 
     List<ProductResponseDto> getProductByCategoryId(Long categoryId);
 
-}
-
 }//ProductService interface ends

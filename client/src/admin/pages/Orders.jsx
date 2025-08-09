@@ -1,32 +1,71 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
-import { DataGrid } from "@mui/x-data-grid";
-import { Box, IconButton, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions, Button, Select } from "@mui/material";
+import { DataGrid } from "@mui/x-data-grid"; // Datagrid used for automatic pagination, sorting, selection etc
+import { Box, IconButton, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions, Button, Select, Chip } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
+import orderApi from "../../api/orderApi";
 
-const API = "http://localhost:8080";
-
-const statusOptions = ["PROCESSING", "SHIPPED", "DELIVERED", "CANCELLED"];
+const statusOptions = ["NEW","PAID","SHIPPED", "DELIVERED", "CANCELLED"];
 
 const Orders = () => {
-  const [rows, setRows] = useState([]);
+  const [rows, setRows] = useState([]); // save the table data -> Orders
   const [loading, setLoading] = useState(true);
-  const [editDialogOpen, setEditDialogOpen] = useState(false);
-  const [selectedOrder, setSelectedOrder] = useState(null);
-  const [editStatus, setEditStatus] = useState("");
-  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false); // is the dialog to edit open?
+  const [selectedOrder, setSelectedOrder] = useState(null); // the order row selected to edit/delete
+  const [editStatus, setEditStatus] = useState(""); //value in the edit dialog's dropdown
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false); // is the dialog to delete open?
+
+  const statusColor = (status) => {
+    switch (status) {
+      case "NEW":
+        return "primary";
+      case "PAID":
+        return "secondary";
+      case "SHIPPED":
+        return "info";
+      case "DELIVERED":
+        return "success";
+      case "CANCELLED":
+        return "error";
+      default:
+        return "secondary";
+    }
+  };
+
+  const renderStatusCell = (params) => {
+    <Chip
+      label={params.value}
+      color={statusColor(params.value)}
+      variant="outlined"
+      size="small"
+    />
+  }
 
   const columns = [
     { field: "orderId", headerName: "Order ID", minWidth: 80 },
     { field: "userId", headerName: "User ID", minWidth: 100 },
-    { field: "totalAmount", headerName: "Total", minWidth: 100 },
-    { field: "orderStatus", headerName: "Status", minWidth: 120 },
-    { field: "createdAt", headerName: "Date", minWidth: 160 },
+    {field: "userName",headerName: "User Name", minWidth: 150},
+    {field: "email", headerName: "Email", minWidth: 200},
+    { field: "totalAmount", headerName: "Total Amount", minWidth: 100 },
+    { field: "status", headerName: "Status", minWidth: 120,
+      renderCell: (params) => (
+        <Chip
+          label={params.value}
+          color={statusColor(params.value)}
+          variant="outlined"
+          size="small"
+        />
+      ),
+    },
+    { field: "orderDate", headerName: "Order Date", minWidth: 160 },
+    {field: "deliveryDate", headerName: "Delivery Date", minWidth: 160},
+    {field:"updatedAt", headerName: "Updated At", minWidth: 160},
     {
       field: "actions",
       headerName: "Actions",
       minWidth: 120,
+      //renderCell used for custom cell rendering(here buttons to edit and delete)
       renderCell: (params) => (
         <>
           <IconButton color="primary" onClick={() => handleOpenEdit(params.row)}>
@@ -40,6 +79,9 @@ const Orders = () => {
     },
   ];
 
+  //runs after first render(componentDidMount)
+  //useEffect calls loadOrders() on mount, triggering an Axios GET request to the backend. 
+  // This pulls the initial order data so my page/table isn’t empty
   useEffect(() => {
     loadOrders();
   }, []);
@@ -48,10 +90,24 @@ const Orders = () => {
     setLoading(true);
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get(`${API}/api/orders/all`, {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      });
-      setRows(res.data.data || []);
+      const res = await orderApi.getAllOrders(token);
+      const mappedRows = (res.data.data || []).map(order => ({
+      orderId: order.orderId,
+      userId: order.userId,
+      userName: order.userName,
+      email: order.email,
+      totalAmount: order.orderItems
+        ? order.orderItems.reduce(
+            (sum, item) => sum + (item.priceAtOrder * item.quantity), 0
+          )
+        : 0,
+      status: order.status,
+      orderDate: order.orderDate,
+      deliveryDate: order.deliveryDate,
+      updatedAt: order.updatedAt,
+      orderItems: order.orderItems, // keep if you need details elsewhere
+    }));
+    setRows(mappedRows);
     } catch (e) {
       setRows([]);
     }
@@ -67,14 +123,7 @@ const Orders = () => {
   const handleUpdateOrder = async () => {
     const token = localStorage.getItem("token");
     try {
-      await axios.patch(
-        `${API}/api/orders/${selectedOrder.orderId}/status`,
-        null,
-        {
-          params: { status: editStatus },
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        }
-      );
+      await orderApi.changeOrderStatus(selectedOrder.orderId, editStatus, token);
       setEditDialogOpen(false);
       loadOrders();
     } catch (e) {
@@ -90,9 +139,7 @@ const Orders = () => {
   const handleDeleteOrder = async () => {
     const token = localStorage.getItem("token");
     try {
-      await axios.delete(`${API}/api/orders/${selectedOrder.orderId}`, {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      });
+      await orderApi.cancelOrder(selectedOrder.orderId, token);
       setDeleteDialogOpen(false);
       loadOrders();
     } catch (err) {

@@ -41,7 +41,7 @@ public class OrderController {
         return ResponseEntity.ok(response);
     }//getAllOrders() ends
 
-    @DeleteMapping("/orders/{orderId}/cancel")
+    @DeleteMapping("/{orderId}/cancel")
     public ResponseEntity<ApiResponse<String>> cancelOrder(@PathVariable Long orderId){
         orderService.cancelOrder(orderId);
         ApiResponse<String> response = ApiResponse.success("Order cancelled successfully!",null);

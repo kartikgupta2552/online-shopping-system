@@ -172,6 +172,4 @@ public class ProductServiceImpl implements ProductService{
 
     }
 
-}
-
 }//ProductServiceImpl() ends
