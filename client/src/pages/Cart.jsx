@@ -23,13 +23,13 @@ const Cart = () => {
   // 🛒 Move item from cart to wishlist
   const moveToWishlist = (item) => {
     addToWishlist(item);
-    removeFromCart(item.id);
+    // removeFromCart(item.id);
   };
 
   // 💖 Move item from wishlist to cart
   const moveToCart = (item) => {
     addToCart(item);
-    removeFromWishlist(item.id);
+    // removeFromWishlist(item.id);
   };
 
   // ⚡ Buy now: navigate to payment if any items in cart, else give user the finger.
@@ -55,7 +55,7 @@ const Cart = () => {
             <div className="col" key={item.id}>
               <div className="card h-100 shadow-sm">
                 <img
-                  src={item.image}
+                  src={item.image_path}
                   className="card-img-top"
                   alt={item.title}
                 />
@@ -122,7 +122,7 @@ const Cart = () => {
                   <p className="card-text mb-1">₹{item.price}</p>
                   <div className="d-flex justify-content-between">
                     <button
-                      className="btn btn-primary btn-sm w-100"
+                      className="btn btn-primary btn-sm w-100 mt-2 me-2"
                       onClick={() => moveToCart(item)}
                     >
                       Add to Cart

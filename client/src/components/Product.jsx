@@ -36,6 +36,7 @@ function Product({ id, title, description, image, price, ...rest }) {
       return;
     }
     addToCart(productObj);
+    navigate("/cart");
   }
 
   function handleWishlistClick(e) {
@@ -45,6 +46,10 @@ function Product({ id, title, description, image, price, ...rest }) {
       return;
     }
     addToWishlist(productObj);
+    alert("move to wishList Successfully");
+    // addToWishlist(item);
+    // alert("move to wishList Successfully");
+    navigate("/cart");
   }
 
   return (
