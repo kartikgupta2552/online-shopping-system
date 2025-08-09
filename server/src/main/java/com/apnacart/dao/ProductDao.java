@@ -18,6 +18,8 @@ public interface ProductDao extends JpaRepository<Product,Long>{
 
     List<Product> findBySubCategory_Category_CategoryId(Long id);
 
+    List<Product> findBySubCategory_SubCategoryId(Long id);
+
     // searching product on name and description
     List<Product> findByProductNameContainingIgnoreCaseOrDescriptionContainingIgnoreCase(String name, String desc);
 

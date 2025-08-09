@@ -4,6 +4,7 @@ import Register from "./pages/Register";
 import ItemDetailsPage from "./pages/ItemDetailsPage";
 import Payment from "./pages/Payment";
 import Cart from "./pages/Cart";
+import "./App.css"
 
 // import WishList from "./pages/WishList";
 

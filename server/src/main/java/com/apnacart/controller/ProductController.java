@@ -78,6 +78,13 @@ public class ProductController {
         List<ProductResponseDto> responseDtos = productService.getProductByCategoryId(categoryId);
         return ResponseEntity.ok(ApiResponse.success("Product fetched successfully by Category", responseDtos));
     }
+
+    @GetMapping("/subcategory/{subCategoryId}")
+    public ResponseEntity<ApiResponse<List<ProductResponseDto>>> getProductBySubCategory(@PathVariable("subCategoryId") Long subCategoryId){
+        List<ProductResponseDto> responseDtos = productService.getProductBySubCategoryId(subCategoryId);
+
+        return ResponseEntity.ok(ApiResponse.success("Product fetched successfully by Subcategory", responseDtos));
+    }
     
     @GetMapping("/search")   
     public ResponseEntity<ApiResponse<List<ProductResponseDto>>> searchProducts(@RequestParam String keyword){
