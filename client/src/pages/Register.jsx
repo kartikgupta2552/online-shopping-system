@@ -2,12 +2,8 @@ import React, { useState } from "react";
 import userApi from "../api/userApi";
 import { Link, useNavigate } from "react-router-dom";
 
-// Set your real registration API endpoint
-const API_URL = "http://localhost:8080/api/users/register";
-
 import axios from "axios";
 
-// import BASE_URL from "../api/apiConfig";
 
 const Register = () => {
   // --- Form State, one true validation home ---
@@ -38,7 +34,7 @@ const Register = () => {
   const validate = (fields) => {
     const tempErrors = {};
 
-    if (!fields.name.trim()) tempErrors.name = "Name is required";
+    if (!fields.userName.trim()) tempErrors.userName = "Name is required";
 
     if (!fields.email.trim()) tempErrors.email = "Email is required";
     else if (!/\S+@\S+\.\S+/.test(fields.email))
@@ -53,9 +49,9 @@ const Register = () => {
     else if (fields.password !== fields.confirmPassword)
       tempErrors.confirmPassword = "Passwords do not match";
 
-    if (!fields.mobile.trim()) tempErrors.mobile = "Mobile number is required";
-    else if (!/^\d{10}$/.test(fields.mobile))
-      tempErrors.mobile = "Enter 10-digit mobile number";
+    if (!fields.mobileNo.trim()) tempErrors.mobileNo = "Mobile number is required";
+    else if (!/^\d{10}$/.test(fields.mobileNo))
+      tempErrors.mobileNo = "Enter 10-digit mobile number";
 
     if (!formData.address.trim()) tempErrors.address = "Address is required";
 
@@ -78,10 +74,10 @@ const Register = () => {
       // Prepare backend payload; adapt to expected backend keys
       // (Assuming backend wants: userName, email, password, mobileNo)
       const payload = {
-        userName: formData.name,
+        userName: formData.userName,
         email: formData.email,
         password: formData.password,
-        mobileNo: formData.mobile,
+        mobileNo: formData.mobileNo,
         address: formData.address,
       };
 
@@ -97,7 +93,7 @@ const Register = () => {
       if(err.response && err.response.data && err.response.data.message){
         setServerError(err.response.data.message);
       }
-      else if(err.response && err.response.data && err.respose.data.data){
+      else if(err.response && err.response.data && err.response.data.data){
         setErrors(err.response.data.data)
       }
       else {
@@ -120,20 +116,20 @@ const Register = () => {
             <form onSubmit={handleSubmit}>
               {/* userName */}
               <div className="mb-3">
-                <label htmlFor="name">Name</label>
+                <label htmlFor="userName">Name</label>
                 <input
                   type="text"
-                  id="name"
+                  id="userName"
                   className={
-                    "form-control" + (errors.name ? " is-invalid" : "")
+                    "form-control" + (errors.userName ? " is-invalid" : "")
                   }
                   placeholder="Enter name"
-                  value={formData.name}
+                  value={formData.userName}
                   onChange={handleChange}
                   disabled={loading}
                 />
-                {errors.name && (
-                  <small className="text-danger">{errors.name}</small>
+                {errors.userName && (
+                  <small className="text-danger">{errors.userName}</small>
                 )}
               </div>
 
@@ -142,7 +138,7 @@ const Register = () => {
                 <label htmlFor="email">Email</label>
 
                 <input
-                  type="text"
+                  type="email"
                   id="email"
                   className={
                     "form-control" + (errors.email ? " is-invalid" : "")
@@ -201,21 +197,21 @@ const Register = () => {
 
               {/* mobileNo */}
               <div className="mb-3">
-                <label htmlFor="mobile">Mobile</label>
+                <label htmlFor="mobileNo">Mobile</label>
                 <input
                   type="tel"
                   maxLength="10"
-                  id="mobile"
+                  id="mobileNo"
                   className={
-                    "form-control" + (errors.mobile ? " is-invalid" : "")
+                    "form-control" + (errors.mobileNo ? " is-invalid" : "")
                   }
                   placeholder="Enter Mobile"
-                  value={formData.mobile}
+                  value={formData.mobileNo}
                   onChange={handleChange}
                   disabled={loading}
                 />
-                {errors.mobile && (
-                  <small className="text-danger">{errors.mobile}</small>
+                {errors.mobileNo && (
+                  <small className="text-danger">{errors.mobileNo}</small>
                 )}
               </div>
 

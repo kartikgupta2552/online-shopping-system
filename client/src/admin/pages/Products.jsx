@@ -25,13 +25,15 @@ const Products = () => {
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState("add"); // or "edit"
   const [selectedProduct, setSelectedProduct] = useState(null);
+  const [imagePreview, setImagePreview] = useState(null);
 
   const emptyForm = {
     productName: "",
     description: "",
     price: "",
     quantity: "",
-    subCategoryId: "", 
+    subCategoryId: "",
+    image: null,
   };
   const [form, setForm] = useState(emptyForm);
   const [formErrors, setFormErrors] = useState({});
@@ -77,7 +79,6 @@ const Products = () => {
     if (subCategories.length > 0) fetchProducts();
   }, [subCategories]); //Now depends on subCategories!
 
-
   // Validate product fields
   const validateForm = (values) => {
     const errors = {};
@@ -92,6 +93,12 @@ const Products = () => {
     )
       errors.quantity = "Non-negative quantity required.";
     if (!values.subCategoryId) errors.subCategoryId = "Sub-category required.";
+
+    // Only require image for new products
+    if (dialogMode === "add" && !values.image) {
+      errors.image = "Product image is required.";
+    }
+
     return errors;
   };
 
@@ -107,11 +114,26 @@ const Products = () => {
             price: product.price,
             quantity: product.quantity,
             subCategoryId: product.subCategoryId || "", // don't use subCategoryName here!
+            image: null, // reset image for edit
           }
         : emptyForm
     );
     setFormErrors({});
+    setImagePreview(null);
     setDialogOpen(true);
+  };
+
+  // Handle image file selection
+  const handleImageChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setForm((f) => ({ ...f, image: file }));
+
+      // Create preview
+      const reader = new FileReader();
+      reader.onload = () => setImagePreview(reader.result);
+      reader.readAsDataURL(file);
+    }
   };
 
   const handleDialogClose = () => {
@@ -129,9 +151,63 @@ const Products = () => {
     const token = localStorage.getItem("token");
     try {
       if (dialogMode === "add") {
-        productApi.addProduct(form);
+        // ✅ Create FormData for multipart request
+        const productData = {
+          productName: form.productName,
+          description: form.description,
+          price: Number(form.price), // Convert to number
+          quantity: Number(form.quantity), // Convert to number
+          subCategoryId: Number(form.subCategoryId), // Convert to number
+        };
+
+        const formData = new FormData();
+
+        // ✅ Create a Blob with proper Content-Type for JSON
+        const productBlob = new Blob([JSON.stringify(productData)], {
+          type: "application/json",
+        });
+
+        // ✅ Append product data as JSON string under 'product' part
+        formData.append("product", productBlob);
+
+        if (form.image) {
+          formData.append("image", form.image);
+        }
+
+        console.log("Sending FormData with parts:", {
+          product: JSON.stringify(productData),
+          productBlobType: productBlob.type,
+          image: form.image ? form.image.name : "No image",
+        });
+
+        await productApi.addProduct(formData);
       } else if (dialogMode === "edit" && selectedProduct) {
-        await productApi.updateProduct(selectedProduct.productId, form);
+        const updateData = {
+          productName: form.productName,
+          description: form.description,
+          price: form.price,
+          quantity: form.quantity,
+          subCategoryId: form.subCategoryId,
+        };
+
+        // ✅ Create FormData for update operation
+        const formData = new FormData();
+        const productBlob = new Blob([JSON.stringify(updateData)], {
+          type: "application/json",
+        });
+
+        formData.append("product", productBlob);
+
+        // Only append image if user selected a new one
+        if (form.image) {
+          formData.append("image", form.image);
+        }
+
+        await productApi.updateProduct(
+          selectedProduct.productId,
+          formData,
+          token
+        );
       }
 
       handleDialogClose();
@@ -149,6 +225,8 @@ const Products = () => {
       });
       setRows(products);
     } catch (e) {
+      console.error("Product operation failed:", e);
+      console.error("Full error response:", e.response?.data);
       alert("Failed! " + (e.response?.data?.message || e.message));
     }
   };
@@ -288,6 +366,38 @@ const Products = () => {
               </MenuItem>
             ))}
           </TextField>
+          <Box sx={{ mt: 2 }}>
+            <Button
+              variant="outlined"
+              component="label"
+              fullWidth
+              sx={{ mb: 1 }}
+            >
+              Upload Product Image
+              <input
+                type="file"
+                accept="image/*"
+                hidden
+                onChange={handleImageChange}
+              />
+            </Button>
+            {formErrors.image && (
+              <div style={{ color: "red", fontSize: "0.75rem", marginTop: 4 }}>
+                {formErrors.image}
+              </div>
+            )}
+
+            {/* Image preview */}
+            {imagePreview && (
+              <Box sx={{ mt: 1, textAlign: "center" }}>
+                <img
+                  src={imagePreview}
+                  alt="Preview"
+                  style={{ maxWidth: "200px", maxHeight: "200px" }}
+                />
+              </Box>
+            )}
+          </Box>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleDialogClose}>Cancel</Button>

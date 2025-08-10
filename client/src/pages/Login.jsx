@@ -1,7 +1,7 @@
 import React, { useState } from "react";
-import axios from 'axios';
+import axios from "axios";
 // import BASE_URL from "../api/apiConfig";
-import { Link,useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const API_URL = "http://localhost:8080/api/users/login";
 
@@ -9,7 +9,7 @@ const Login = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [errors, setErrors] = useState({});
-      const navigate = useNavigate();
+  const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -30,49 +30,53 @@ const Login = () => {
     if (Object.keys(validationErrors).length > 0) {
       setErrors(validationErrors);
 
-      return ;
+      return;
     }
 
     //backend login authentication
     try {
-      const response = await fetch (API_URL, {  //fetch sends credentials to the backend api
-        method:"POST",
-        headers:{"Content-Type": "application/json"},
-        body: JSON.stringify({email,password}),  
+      const response = await fetch(API_URL, {
+        //fetch sends credentials to the backend api
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email, password }),
       });
 
-      if(!response.ok){
+      if (!response.ok) {
         //login failed
-        setErrors({general: "Invalid email or password"});
+        setErrors({ general: "Invalid email or password" });
         return;
       }
 
       const result = await response.json();
       const backendUser = result.data;
       //if something other than token/data comes from backend
-      if(!backendUser || !backendUser.token || !backendUser.userRole){
-        setErrors({general: "Invalid response from the server. Please try again after sometime."});
+      if (!backendUser || !backendUser.token || !backendUser.userRole) {
+        setErrors({
+          general:
+            "Invalid response from the server. Please try again after sometime.",
+        });
         return;
       }
 
-
       //get JWT and userinfo from the response send via backend
-      localStorage.setItem("token",backendUser.token); //save token in local storage
-      localStorage.setItem("user",JSON.stringify({
-        userId:backendUser.userId,
-        email: backendUser.email,
-        userName: backendUser.userName,
-        userRole: backendUser.userRole,
-        userStatus: backendUser.userStatus,
-        token: backendUser.token
-      }));//save user
-      
+      localStorage.setItem("token", backendUser.token); //save token in local storage
+      localStorage.setItem(
+        "user",
+        JSON.stringify({
+          userId: backendUser.userId,
+          email: backendUser.email,
+          userName: backendUser.userName,
+          userRole: backendUser.userRole,
+          userStatus: backendUser.userStatus,
+          token: backendUser.token,
+        })
+      ); //save user
+
       //redirect to homepage after login
-      navigate("/",{state: {loginSuccess: true} });
-
+      navigate("/", { state: { loginSuccess: true } });
     } catch (error) {
-      setErrors({general : "Login failed, please try again."});
-
+      setErrors({ general: "Login failed, please try again." });
     }
   };
 
@@ -83,7 +87,9 @@ const Login = () => {
           <div className="card shadow p-4">
             <h3 className="text-center mb-4">Login</h3>
             {errors.general && (
-              <div className="alert alert-danger text-center" >{errors.general}</div>
+              <div className="alert alert-danger text-center">
+                {errors.general}
+              </div>
             )}
             <form onSubmit={handleSubmit}>
               <div className="mb-3">
