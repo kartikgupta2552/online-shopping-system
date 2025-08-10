@@ -8,7 +8,7 @@ const Footer = () => (
                 <div className="col-md-6 mb-2">
                     <h5>About Us</h5>
                     <p>
-                        Welcome to the Not-Another-Shop a place where great deals meet zero bullshit. We’re a crew
+                        Welcome to the ApnaCart a place where great deals meet zero bullshit. We’re a crew
                         of shopping addicts and tech weirdos making online buying actually enjoyable. Real products,
                         real support, and absolutely no scammy nonsense. Want honesty and maybe a few laughs? You’re in
                         the right damn spot.

@@ -48,6 +48,14 @@ public class OrderController {
         return ResponseEntity.ok(response);
     }//cancelOrder() ends
 
+    //delete order
+    @DeleteMapping("/{orderId}/delete")
+    public ResponseEntity<ApiResponse<String>> deleteOrder(@PathVariable Long orderId){
+        orderService.deleteOrder(orderId);
+        ApiResponse<String> response = ApiResponse.success("Order deleted successfully!",null);
+        return ResponseEntity.ok(response);
+    }//deleteOrder() ends
+
     @PatchMapping("/{orderId}/status")
     public ResponseEntity<ApiResponse<OrderResponseDto>> changeOrderStatus(
             @PathVariable Long orderId,

@@ -60,6 +60,29 @@ const Users = () => {
   const [addUserServerError, setAddUserServerError] = useState("");
   const [openAdd, setOpenAdd] = useState(false);
 
+  const checkUserDependencies = async (userId, token) => {
+    try {
+      // You'll need to create these API endpoints in your backend
+      const ordersResponse = await userApi.getUserOrders(userId, token);
+      const cartResponse = await userApi.getUserCart(userId, token);
+
+      const hasOrders =
+        ordersResponse.data.data && ordersResponse.data.data.length > 0;
+      const hasCartItems =
+        cartResponse.data.data && cartResponse.data.data.length > 0;
+
+      return {
+        hasOrders,
+        hasCartItems,
+        canDelete: !hasOrders && !hasCartItems,
+      };
+    } catch (err) {
+      // If API calls fail, proceed with deletion attempt
+      console.warn("Could not check user dependencies:", err);
+      return { canDelete: true, hasOrders: false, hasCartItems: false };
+    }
+  };
+
   const validateAddUserFields = (fields) => {
     const errors = {};
     if (!fields.userName || fields.userName.trim().length < 2)
@@ -131,7 +154,13 @@ const Users = () => {
     setOpenEdit(true);
   };
 
+  // ✅ Enhanced delete handler with better state checking
   const handleDelete = (user) => {
+    console.log("Deleting user:", user); // Debug log
+    if (!user || !user.userId) {
+      console.error("Invalid user data for deletion:", user);
+      return;
+    }
     setSelectedUser(user);
     setOpenDelete(true);
   };
@@ -229,6 +258,7 @@ const Users = () => {
       setLoading(true);
       const token = localStorage.getItem("token");
       const res = await userApi.getAllUsers(token);
+      console.log(res.data.data);
       setRows(res.data.data);
       console.log("Fetched users:", res.data.data);
       setLoading(false);
@@ -489,10 +519,51 @@ const Users = () => {
           </Button>
           <Button
             onClick={async () => {
-              if (!selectedUser) return;
+              if (!selectedUser || !selectedUser.userId) {
+                console.error("No user selected for deletion:", selectedUser);
+                alert("Error: No user selected for deletion.");
+                setOpenDelete(false);
+                return;
+              }
+
               const token = localStorage.getItem("token");
+              if (!token) {
+                alert("Session expired. Please login again.");
+                return;
+              }
+
               try {
+                // ✅ Pre-check for dependencies
+                const dependencies = await checkUserDependencies(
+                  selectedUser.userId,
+                  token
+                );
+
+                if (!dependencies.canDelete) {
+                  let message = `Selected user "${selectedUser.userName}" cannot be deleted because they have:\n\n`;
+
+                  if (dependencies.hasOrders) {
+                    message +=
+                      "• Active orders that need to be completed or cancelled\n";
+                  }
+
+                  if (dependencies.hasCartItems) {
+                    message +=
+                      "• Items in their shopping cart that need to be cleared\n";
+                  }
+
+                  message +=
+                    "\nPlease resolve these issues before attempting to delete this user.";
+
+                  alert(message);
+                  setOpenDelete(false);
+                  return;
+                }
+
+                // Proceed with deletion if no dependencies
+                console.log("Attempting to delete user:", selectedUser.userId);
                 await deleteUserApi(selectedUser.userId, token);
+
                 setRows((prev) =>
                   prev.filter((row) => row.userId !== selectedUser.userId)
                 );
@@ -500,10 +571,24 @@ const Users = () => {
                 setSnackMsg("User deleted successfully!");
                 setSnackOpen(true);
               } catch (err) {
-                alert(
-                  "Delete failed: " +
-                    (err.response?.data?.message || err.message)
-                );
+                console.error("Delete error:", err);
+
+                // Fallback error handling
+                if (err.response?.status === 500) {
+                  alert(
+                    `Selected user "${selectedUser.userName}" cannot be deleted because they have an order or other related data.\n\n` +
+                      "Please contact the system administrator for assistance."
+                  );
+                } else {
+                  alert(
+                    "Delete failed: " +
+                      (err.response?.data?.message ||
+                        err.message ||
+                        "Unknown error")
+                  );
+                }
+
+                setOpenDelete(false);
               }
             }}
             color="error"
@@ -527,9 +612,12 @@ const Users = () => {
             value={addUserFields.userName}
             error={!!addUserErrors.userName}
             helperText={addUserErrors.userName}
-            onChange={(e) =>
-              setAddUserFields((f) => ({ ...f, userName: e.target.value }))
-            }
+            onChange={(e) => {
+              setAddUserFields((f) => ({ ...f, userName: e.target.value }));
+              // Clear errors when user starts typing
+              setAddUserErrors((errs) => ({ ...errs, userName: undefined }));
+              setAddUserServerError("");
+            }}
             fullWidth
           />
           <TextField
@@ -610,7 +698,7 @@ const Users = () => {
               if (Object.keys(errs).length > 0) return;
               setAddUserLoading(true);
               try {
-                await userApi.register({
+                await userApi.registerUser({
                   userName: addUserFields.userName,
                   email: addUserFields.email,
                   password: addUserFields.password,
@@ -634,12 +722,20 @@ const Users = () => {
                 if (typeof loadUsers === "function") loadUsers();
               } catch (err) {
                 setAddUserLoading(false);
+                console.error("Add user error:", err); // Debug log
                 if (
                   err.response &&
                   err.response.data &&
                   err.response.data.message
                 ) {
                   setAddUserServerError(err.response.data.message);
+                } else if (
+                  err.response &&
+                  err.response.data &&
+                  err.response.data.data
+                ) {
+                  // Handle field-level validation errors from backend
+                  setAddUserErrors(err.response.data.data);
                 } else {
                   setAddUserServerError("Failed to add user. Try again.");
                 }

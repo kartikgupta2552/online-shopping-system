@@ -1,28 +1,29 @@
 import axios from "axios";
+import axiosInstance from "./axiosInstance";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://localhost:8080";
 
 const userApi = {
     //register user(for both customer and admin)
-    register: async (userData) => {
-        return axios.post(`${BASE_URL}/api/users/register`, userData);
+    registerUser: async (userData) => {
+        return axiosInstance.post(`${BASE_URL}/api/users/register`, userData);
     },
 
     //login user
     login: async (email, password) => {
-        return axios.post(`${BASE_URL}/api/users/login`, { email, password });
+        return axiosInstance.post(`${BASE_URL}/api/users/login`, { email, password });
     },
 
     //get all users(admin)
     getAllUsers: async (token) => {
-        return axios.get(`${BASE_URL}/api/users/all`, {
+        return axiosInstance.get(`${BASE_URL}/api/users/all`, {
             headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
     },
 
     //update user profile
     updateUser: async (userId, userData, token) => {
-        return axios.put
+        return axiosInstance.put
             (`${BASE_URL}/api/users/${userId}/profile`,
                 userData,
                 {
@@ -32,14 +33,14 @@ const userApi = {
 
     //delete user(admin)
     deleteUser: async (userId, token) => {
-        return axios.delete(`${BASE_URL}/api/users/${userId}/hard-delete`, {
+        return axiosInstance.delete(`${BASE_URL}/api/users/${userId}/hard-delete`, {
             headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
     },
 
     //change user role
     changeRole: async (userId, role, token) => {
-        return axios.patch(
+        return axiosInstance.patch(
             `${BASE_URL}/api/users/${userId}/role?role=${role}`,
             { }, //empty body
             {
@@ -50,7 +51,7 @@ const userApi = {
 
     //change user status
     changeStatus: async (userId, status, token) => {
-        return axios.patch(
+        return axiosInstance.patch(
             `${BASE_URL}/api/users/${userId}/status?status=${status}`,
             { }, //empty body
             {

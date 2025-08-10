@@ -55,38 +55,16 @@ const productApi = {
   },
 
   //update product -> requires multipart request
-  updateProduct: async (productId, productData) => {
-    const token = localStorage.getItem("token");
-    //create formdata for multi form request
-    // 1. Create a Blob from your product JSON, set its type
-    const productBlob = new Blob(
-      [JSON.stringify({
-        productName: productData.productName,
-        description: productData.description,
-        price: productData.price,
-        quantity: productData.quantity,
-        subCategoryId: productData.subCategoryId,
-      })],
-      { type: "application/json" }
-    );
-    // 2. Append it as 'product', so the part's content-type is set correctly
-    formData.append("product", productBlob);
-    //handle optional image
-    if (productData.image) {
-      formData.append("image", productData.image);
+updateProduct: async (productId, formData, token) => {
+  const config = {
+    headers: {
+      // ✅ Don't set Content-Type for FormData - let browser handle it
+      ...(token && { Authorization: `Bearer ${token}` })
     }
-    //make PUT request with formdata NOT JSON!
-    const response = await axiosInstance.put(
-      `${BASE_URL}/product/${productId}`,
-      formData,
-      {
-        headers: {
-          Authorization: `Bearer ${token}`
-        }
-      }
-    );
-    return response.data;
-  }
+  };
+
+  return axiosInstance.put(`${BASE_URL}/product/${productId}`, formData, config);
+},
 };
 
 export default productApi

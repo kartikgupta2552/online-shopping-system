@@ -200,7 +200,7 @@ const Orders = () => {
   const handleDeleteOrder = async () => {
     const token = localStorage.getItem("token");
     try {
-      await orderApi.cancelOrder(selectedOrder.orderId, token);
+      await orderApi.deleteOrder(selectedOrder.orderId, token);
       setDeleteDialogOpen(false);
       loadOrders();
     } catch (err) {
