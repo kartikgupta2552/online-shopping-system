@@ -1,40 +1,41 @@
 import axios from "axios";
+import axiosInstance from "./axiosInstance";
 
 const BASE_URL = import.meta.env.VITE_API_BASE_URL
 
 const productApi = {
   getProductByCategoryId: async (categoryId) => {
-    const response = await axios.get(`${BASE_URL}/product/category/${categoryId}`)
+    const response = await axiosInstance.get(`${BASE_URL}/product/category/${categoryId}`)
     return response.data;
   },
 
-  getProductBySubCategoryId: async (subCategoryId) => {
-    const response = await axios.get(`${BASE_URL}/product/subcategory/${subCategoryId}`)
+  getProductBySubCategoryId: async(subCategoryId) => {
+    const response = await axiosInstance.get(`${BASE_URL}/product/subcategory/${subCategoryId}`)
     return response.data
   },
 
   searchProduct: async (keyword) => {
-    const response = await axios.get(`${BASE_URL}/product/search`, {
-      params: { keyword: keyword }
+    const response = await axiosInstance.get(`${BASE_URL}/product/search`, {
+        params : { keyword : keyword }
     })
     return response.data
   },
 
   getProductById: async (productId) => {
-    const response = await axios.get(`${BASE_URL}/product/${productId}`)
+    const response = await axiosInstance.get(`${BASE_URL}/product/${productId}`)
     return response.data
   },
 
   //get all products
   getAllProducts: async () => {
-    const response = await axios.get(`${BASE_URL}/product`);
+    const response = await axiosInstance.get(`${BASE_URL}/product`);
     return response.data;
   },
 
   //add product
   addProduct: async (productData) => {
     const token = localStorage.getItem("token");
-    const response = await axios.post(`${BASE_URL}/product`, productData, {
+    const response = await axiosInstance.post(`${BASE_URL}/product`, productData, {
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -45,7 +46,7 @@ const productApi = {
   //delete product
   deleteProduct: async (productId) => {
     const token = localStorage.getItem("token");
-    const response = await axios.delete(`${BASE_URL}/product/${productId}`, {
+    const response = await axiosInstance.delete(`${BASE_URL}/product/${productId}`, {
       headers: {
         Authorization: `Bearer ${token}`
       }
@@ -75,7 +76,7 @@ const productApi = {
       formData.append("image", productData.image);
     }
     //make PUT request with formdata NOT JSON!
-    const response = await axios.put(
+    const response = await axiosInstance.put(
       `${BASE_URL}/product/${productId}`,
       formData,
       {
@@ -86,7 +87,6 @@ const productApi = {
     );
     return response.data;
   }
-
 };
 
 export default productApi
