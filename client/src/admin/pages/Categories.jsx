@@ -10,6 +10,8 @@ import {
   IconButton,
   TextField,
   MenuItem,
+  Paper,
+  Divider,
 } from "@mui/material";
 import { DataGrid } from "@mui/x-data-grid";
 import EditIcon from "@mui/icons-material/Edit";
@@ -30,7 +32,7 @@ const Categories = () => {
   const [selected, setSelected] = useState(null);
 
   // --- Form State ---
-  const [form, setForm] = useState({ name: "", categoryId: "" }); // always filled for controlled inputs!
+  const [form, setForm] = useState({ name: "", categoryId: "" });
   const [formErrors, setFormErrors] = useState({});
   const [loading, setLoading] = useState(false);
 
@@ -46,6 +48,7 @@ const Categories = () => {
       }));
       setCategories(cats);
       console.log(cats);
+
       const subRes = await subcategoryApi.getAllSubcategories();
       console.log(subRes);
       const subs = (subRes.data.data || []).map((sub) => ({
@@ -70,7 +73,7 @@ const Categories = () => {
     setDialogMode(mode);
     setEditMode(isEdit);
     setSelected(row);
-    // 🩸 Set default values, never undefined!
+    // Set default values, never undefined!
     setForm(
       row
         ? {
@@ -197,6 +200,7 @@ const Categories = () => {
       ),
     },
   ];
+
   const subCols = [
     { field: "subCategoryId", headerName: "ID", minWidth: 60 },
     { field: "name", headerName: "Name", minWidth: 120, flex: 1 },
@@ -224,12 +228,18 @@ const Categories = () => {
     },
   ];
 
-  // --- Render ---
+  // --- Render with Fixed Layout ---
   return (
-    <Box sx={{ width: "100%", p: 2 }}>
-      <Box display="flex" alignItems="center" justifyContent="space-between">
-        <h2 style={{ margin: 0 }}>Categories</h2>
-        <div>
+    <Box sx={{ width: "100%", p: 3 }}>
+      {/* Header Section */}
+      <Box
+        display="flex"
+        alignItems="center"
+        justifyContent="space-between"
+        mb={3}
+      >
+        <h2 style={{ margin: 0 }}>Categories Management</h2>
+        <Box>
           <Button
             color="primary"
             startIcon={<AddIcon />}
@@ -247,32 +257,57 @@ const Categories = () => {
           >
             Add Subcategory
           </Button>
-        </div>
+        </Box>
       </Box>
-      {/* --- Categories Table --- */}
-      <div style={{ height: 300, marginTop: 18 }}>
-        <DataGrid
-          rows={categories}
-          columns={catCols}
-          pageSize={6}
-          rowsPerPageOptions={[6]}
-          getRowId={(row) => row.categoryId}
-          autoHeight
-        />
-      </div>
-      {/* --- Subcategories Table --- */}
-      <h3 style={{ marginTop: 32 }}>Subcategories</h3>
-      <div style={{ height: 300 }}>
-        <DataGrid
-          rows={subCategories}
-          columns={subCols}
-          pageSize={6}
-          rowsPerPageOptions={[6]}
-          getRowId={(row) => row.subCategoryId}
-          autoHeight
-        />
-      </div>
-      {/* --- Add/Edit Dialog --- */}
+
+      {/* Categories Section - Wrapped in Paper for visual separation */}
+      <Paper elevation={2} sx={{ p: 3, mb: 4 }}>
+        <Box display="flex" alignItems="center" justifyContent="between" mb={2}>
+          <h3 style={{ margin: 0, color: "#1976d2" }}>Categories</h3>
+        </Box>
+        <Box sx={{ height: 400, width: "100%" }}>
+          <DataGrid
+            rows={categories}
+            columns={catCols}
+            pageSize={6}
+            rowsPerPageOptions={[6]}
+            getRowId={(row) => row.categoryId}
+            disableSelectionOnClick
+            sx={{
+              "& .MuiDataGrid-root": {
+                border: "none",
+              },
+            }}
+          />
+        </Box>
+      </Paper>
+
+      {/* Visual Divider */}
+      <Divider sx={{ my: 4 }} />
+
+      {/* Subcategories Section - Wrapped in Paper for visual separation */}
+      <Paper elevation={2} sx={{ p: 3, mt: 4 }}>
+        <Box display="flex" alignItems="center" justifyContent="between" mb={2}>
+          <h3 style={{ margin: 0, color: "#1976d2" }}>Subcategories</h3>
+        </Box>
+        <Box sx={{ height: 400, width: "100%" }}>
+          <DataGrid
+            rows={subCategories}
+            columns={subCols}
+            pageSize={6}
+            rowsPerPageOptions={[6]}
+            getRowId={(row) => row.subCategoryId}
+            disableSelectionOnClick
+            sx={{
+              "& .MuiDataGrid-root": {
+                border: "none",
+              },
+            }}
+          />
+        </Box>
+      </Paper>
+
+      {/* Add/Edit Dialog */}
       <Dialog open={dialogOpen} onClose={handleDialogClose}>
         <DialogTitle>
           {editMode
