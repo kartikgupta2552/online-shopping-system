@@ -1,9 +1,21 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import {useNavigate} from 'react-router-dom'
 import headphoneImg from '../assets/headphones.jpg';
-import Navbar from '../components/Navbar';
 import MyNavbar from '../components/MyNavbar';
+import { useLocation } from 'react-router-dom';
+import productApi from '../api/productApi';
+import Product from '../components/Product';
 const ItemDetailsPage = () => {
+
+  const BASE_URL = import.meta.env.VITE_API_BASE_URL
+  const location = useLocation()
+  const productId = location.state?.productId
+  const [product, setProduct] = useState({})
+  const [relatedProducts, setRelatedProducts] = useState([])
+  
+  useEffect(() => {
+    fetchProductData()
+  },[productId])
 
   const navigate=useNavigate();
   function handleClick(){
@@ -14,6 +26,19 @@ const ItemDetailsPage = () => {
   }
   function handleClickPayment(){
     navigate('/payment')
+  }
+
+  const fetchProductData = async () => {
+    try{
+      const productData = await productApi.getProductById(productId)
+      setProduct(productData.data)
+      
+      const relatedProductData = await productApi.getProductBySubCategoryId(productData.data.subCategoryId)
+      setRelatedProducts(relatedProductData.data)
+    }
+    catch(error){
+      console.log("Error fetching Product data:", error)
+    }
   }
     
   return (
@@ -27,16 +52,14 @@ const ItemDetailsPage = () => {
       <div className="container-fluid mb-5">
         <div className="row mb-4">
           <div className="col-md-5">
-            <img src={headphoneImg}alt="Product" className="img-fluid rounded shadow"  />
+            <img src={`${BASE_URL}${product.imagePath}`}alt="Product" className="img-fluid rounded shadow"  />
           </div>
           <div className="col-md-7">
-            <h3>Electronic Item</h3>
-            <p><strong>Name:</strong> Bluetooth Headphones</p>
-            <p><strong>Details:</strong> Wireless, noise cancelling, 30hr battery life<br/>
-            Wireless, noise cancelling, 30hr battery life<br/>
-            Wireless, noise cancelling, 30hr battery life
+            <h3><strong>Name: </strong>{product.productName}</h3>
+            <p><strong>Details: </strong> 
+            {product.description}
             </p>
-            <h4 className="text-success">Price: ₹2000</h4>
+            <h4 className="text-success">Price: ₹{product.price}</h4>
             <div className="d-flex flex-wrap gap-2 mt-3">
               <button className="btn btn-success" onClick={handleClick} >Add to Cart</button>
             
@@ -49,12 +72,19 @@ const ItemDetailsPage = () => {
         {/* Related Items */}
         <h5 className="mb-3">Related Items</h5>
         <div className="row flex-nowrap overflow-auto">
-          {[1, 2, 3, 4, 5, 6].map((item) => (
-            <div className="col-6 col-md-2 mb-2" key={item}>
-              <div className="card">
-                <img src={headphoneImg} className="card-img-top" alt={`Item ${item}`} />
-              </div>
+          {relatedProducts.map((product) => (
+            product.productId != productId && (
+              <div className="col-6 col-md-2 mb-2 me-4" key={product.productId}>
+              <Product 
+                  id={product.productId}
+                  title={product.productName}
+                  description={product.description}
+                  price={product.price}
+                  image={product.imagePath}
+                  variant='small'
+                  />
             </div>
+            )
           ))}
         </div>
       </div>

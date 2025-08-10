@@ -1,7 +1,6 @@
-import axios from "axios"
+import axios from "axios";
 
-const BASE_URL = import.meta.env.VITE_API_BASE_URL
-
+const BASE_URL = import.meta.env.VITE_API_BASE_URL;
 // API for category management
 const categoryApi = {
     //create category -> admin function
@@ -11,7 +10,6 @@ const categoryApi = {
             headers: token ? { Authorization: `Bearer ${token}` } : {},
         })
     },
-
     //update category -> admin function
     updateCategory: async (id, data) => {
         const token = localStorage.getItem("token");
@@ -19,7 +17,6 @@ const categoryApi = {
             headers: token ? { Authorization: `Bearer ${token}` } : {},
         })
     },
-
     //delete category -> admin function
     deleteCategory: async (id) => {
         const token = localStorage.getItem("token");
@@ -27,11 +24,9 @@ const categoryApi = {
             headers: token ? { Authorization: `Bearer ${token}` } : {},
         })
     },
-
     //view all categories -> no need for authorization
     getAllCategories: async () => {
         return axios.get(`${BASE_URL}/category`)
     },
 }
-
 export default categoryApi

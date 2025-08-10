@@ -86,7 +86,7 @@ const AdminShell = () => {
             component="div"
             sx={{ fontWeight: "bold" }}
           >
-            admin panel
+            Admin Panel
           </Typography>
         </Toolbar>
       </AppBar>
@@ -104,19 +104,7 @@ const AdminShell = () => {
       >
         <Toolbar />
         <Box sx={{ display: "flex", flexDirection: "column", height: "100%" }}>
-          <Typography
-            variant="h6"
-            align="center"
-            gutterBottom
-            sx={{
-              py: 2,
-              fontWeight: "bold",
-              letterSpacing: 2,
-              color: "#1a237e",
-            }}
-          >
-            admin panel
-          </Typography>
+          
           <List>
             {sidebarItems.map(({ text, path, icon }) => (
               <ListItemButton

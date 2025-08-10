@@ -9,7 +9,7 @@ import com.apnacart.dto.request.ProductRequestDto;
 import com.apnacart.dto.response.ProductResponseDto;
 
 public interface ProductService {
-
+    
     ProductResponseDto createProduct(ProductRequestDto dto, MultipartFile imageFile) throws IOException ;
 
     ProductResponseDto getProductById(Long productId);
@@ -21,5 +21,9 @@ public interface ProductService {
     void deleteProduct(Long productId) throws IOException;
 
     List<ProductResponseDto> getProductByCategoryId(Long categoryId);
+
+    List<ProductResponseDto> getProductBySubCategoryId(Long subCategoryId);
+
+    List<ProductResponseDto> searchProducts(String keyword);
 
 }//ProductService interface ends

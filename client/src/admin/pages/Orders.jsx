@@ -1,12 +1,34 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { DataGrid } from "@mui/x-data-grid"; // Datagrid used for automatic pagination, sorting, selection etc
-import { Box, IconButton, MenuItem, Dialog, DialogTitle, DialogContent, DialogActions, Button, Select, Chip } from "@mui/material";
+import {
+  Box,
+  IconButton,
+  MenuItem,
+  Dialog,
+  DialogTitle,
+  DialogContent,
+  DialogActions,
+  Button,
+  Select,
+  Chip,
+} from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import orderApi from "../../api/orderApi";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  Legend,
+  ResponsiveContainer,
+} from "recharts";
+import TimelineIcon from "@mui/icons-material/Timeline";
 
-const statusOptions = ["NEW","PAID","SHIPPED", "DELIVERED", "CANCELLED"];
+const statusOptions = ["NEW", "PAID", "SHIPPED", "DELIVERED", "CANCELLED"];
 
 const Orders = () => {
   const [rows, setRows] = useState([]); // save the table data -> Orders
@@ -15,6 +37,31 @@ const Orders = () => {
   const [selectedOrder, setSelectedOrder] = useState(null); // the order row selected to edit/delete
   const [editStatus, setEditStatus] = useState(""); //value in the edit dialog's dropdown
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false); // is the dialog to delete open?
+  // Aggregate orders by month for trends – because raw dates are as useful as a chocolate teapot. We'll group 'em client-side, you efficient fuck.
+  const [trendData, setTrendData] = useState([]); // New state for chart data – array of { month: '2025-08', orders: 5 }, starts empty to avoid crashes.
+
+  useEffect(() => {
+    // New useEffect to process data *after* rows load – runs whenever rows change (e.g., after loadOrders).
+    if (rows.length > 0) {
+      // Only process if we have data – empathetic to your empty-shop scenarios. 😢
+      const monthlyOrders = {}; // Object to tally counts: key = 'YYYY-MM', value = count of orders in that month.
+      rows.forEach((order) => {
+        // Loop through your rows (from loadOrders' mappedRows).
+        if (order.orderDate) {
+          // Check for orderDate – skips any weird nulls from your API.
+          const date = new Date(order.orderDate); // Parse the date string into a real Date object – assumes ISO like '2025-08-10T12:00:00'.
+          const monthKey = `${date.getFullYear()}-${String(
+            date.getMonth() + 1
+          ).padStart(2, "0")}`; // Format as 'YYYY-MM' (e.g., '2025-08') – getFullYear() for year, getMonth() +1 because JS months are 0-based (fucking idiots), padStart adds leading zero for single digits.
+          monthlyOrders[monthKey] = (monthlyOrders[monthKey] || 0) + 1; // Increment count: If key exists, add 1; else start at 1. || 0 is a lazy default.
+        }
+      });
+      const sortedData = Object.keys(monthlyOrders) // Convert object to array, sort by month for chronological order.
+        .sort() // Sorts keys like '2025-01' before '2025-02' – alphabetical works for YYYY-MM.
+        .map((key) => ({ month: key, orders: monthlyOrders[key] })); // Map to array of {month, orders} – Recharts loves this format.
+      setTrendData(sortedData); // Update state – now chart has data!
+    }
+  }, [rows]); // Depends on rows – re-runs when orders load/update/delete.
 
   const statusColor = (status) => {
     switch (status) {
@@ -39,16 +86,19 @@ const Orders = () => {
       color={statusColor(params.value)}
       variant="outlined"
       size="small"
-    />
-  }
+    />;
+  };
 
   const columns = [
     { field: "orderId", headerName: "Order ID", minWidth: 80 },
     { field: "userId", headerName: "User ID", minWidth: 100 },
-    {field: "userName",headerName: "User Name", minWidth: 150},
-    {field: "email", headerName: "Email", minWidth: 200},
+    { field: "userName", headerName: "User Name", minWidth: 150 },
+    { field: "email", headerName: "Email", minWidth: 200 },
     { field: "totalAmount", headerName: "Total Amount", minWidth: 100 },
-    { field: "status", headerName: "Status", minWidth: 120,
+    {
+      field: "status",
+      headerName: "Status",
+      minWidth: 120,
       renderCell: (params) => (
         <Chip
           label={params.value}
@@ -59,8 +109,8 @@ const Orders = () => {
       ),
     },
     { field: "orderDate", headerName: "Order Date", minWidth: 160 },
-    {field: "deliveryDate", headerName: "Delivery Date", minWidth: 160},
-    {field:"updatedAt", headerName: "Updated At", minWidth: 160},
+    { field: "deliveryDate", headerName: "Delivery Date", minWidth: 160 },
+    { field: "updatedAt", headerName: "Updated At", minWidth: 160 },
     {
       field: "actions",
       headerName: "Actions",
@@ -68,10 +118,16 @@ const Orders = () => {
       //renderCell used for custom cell rendering(here buttons to edit and delete)
       renderCell: (params) => (
         <>
-          <IconButton color="primary" onClick={() => handleOpenEdit(params.row)}>
+          <IconButton
+            color="primary"
+            onClick={() => handleOpenEdit(params.row)}
+          >
             <EditIcon />
           </IconButton>
-          <IconButton color="error" onClick={() => handleOpenDelete(params.row)}>
+          <IconButton
+            color="error"
+            onClick={() => handleOpenDelete(params.row)}
+          >
             <DeleteIcon />
           </IconButton>
         </>
@@ -80,7 +136,7 @@ const Orders = () => {
   ];
 
   //runs after first render(componentDidMount)
-  //useEffect calls loadOrders() on mount, triggering an Axios GET request to the backend. 
+  //useEffect calls loadOrders() on mount, triggering an Axios GET request to the backend.
   // This pulls the initial order data so my page/table isn’t empty
   useEffect(() => {
     loadOrders();
@@ -91,23 +147,24 @@ const Orders = () => {
     try {
       const token = localStorage.getItem("token");
       const res = await orderApi.getAllOrders(token);
-      const mappedRows = (res.data.data || []).map(order => ({
-      orderId: order.orderId,
-      userId: order.userId,
-      userName: order.userName,
-      email: order.email,
-      totalAmount: order.orderItems
-        ? order.orderItems.reduce(
-            (sum, item) => sum + (item.priceAtOrder * item.quantity), 0
-          )
-        : 0,
-      status: order.status,
-      orderDate: order.orderDate,
-      deliveryDate: order.deliveryDate,
-      updatedAt: order.updatedAt,
-      orderItems: order.orderItems, // keep if you need details elsewhere
-    }));
-    setRows(mappedRows);
+      const mappedRows = (res.data.data || []).map((order) => ({
+        orderId: order.orderId,
+        userId: order.userId,
+        userName: order.userName,
+        email: order.email,
+        totalAmount: order.orderItems
+          ? order.orderItems.reduce(
+              (sum, item) => sum + item.priceAtOrder * item.quantity,
+              0
+            )
+          : 0,
+        status: order.status,
+        orderDate: order.orderDate,
+        deliveryDate: order.deliveryDate,
+        updatedAt: order.updatedAt,
+        orderItems: order.orderItems, // keep if you need details elsewhere
+      }));
+      setRows(mappedRows);
     } catch (e) {
       setRows([]);
     }
@@ -116,14 +173,18 @@ const Orders = () => {
 
   const handleOpenEdit = (order) => {
     setSelectedOrder(order);
-    setEditStatus(order.orderStatus || "");
+    setEditStatus(order.status || "");
     setEditDialogOpen(true);
   };
 
   const handleUpdateOrder = async () => {
     const token = localStorage.getItem("token");
     try {
-      await orderApi.changeOrderStatus(selectedOrder.orderId, editStatus, token);
+      await orderApi.changeOrderStatus(
+        selectedOrder.orderId,
+        editStatus,
+        token
+      );
       setEditDialogOpen(false);
       loadOrders();
     } catch (e) {
@@ -166,27 +227,37 @@ const Orders = () => {
         <DialogContent>
           <Select
             value={editStatus}
-            onChange={e => setEditStatus(e.target.value)}
+            onChange={(e) => setEditStatus(e.target.value)}
             fullWidth
             sx={{ mt: 2 }}
           >
-            {statusOptions.map(s => (
-              <MenuItem key={s} value={s}>{s}</MenuItem>
+            {statusOptions.map((s) => (
+              <MenuItem key={s} value={s}>
+                {s}
+              </MenuItem>
             ))}
           </Select>
         </DialogContent>
         <DialogActions>
           <Button onClick={() => setEditDialogOpen(false)}>Cancel</Button>
-          <Button variant="contained" color="primary" onClick={handleUpdateOrder}>
+          <Button
+            variant="contained"
+            color="primary"
+            onClick={handleUpdateOrder}
+          >
             Update
           </Button>
         </DialogActions>
       </Dialog>
 
-      <Dialog open={deleteDialogOpen} onClose={() => setDeleteDialogOpen(false)}>
+      <Dialog
+        open={deleteDialogOpen}
+        onClose={() => setDeleteDialogOpen(false)}
+      >
         <DialogTitle>Delete Order</DialogTitle>
         <DialogContent>
-          Are you sure you want to delete <b>Order #{selectedOrder?.orderId}</b>?<br />
+          Are you sure you want to delete <b>Order #{selectedOrder?.orderId}</b>
+          ?<br />
           This cannot be undone!
         </DialogContent>
         <DialogActions>

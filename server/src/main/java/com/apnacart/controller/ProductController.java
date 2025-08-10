@@ -1,6 +1,7 @@
 package com.apnacart.controller;
 
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
@@ -76,6 +77,20 @@ public class ProductController {
         List<ProductResponseDto> responseDtos = productService.getProductByCategoryId(categoryId);
         return ResponseEntity.ok(ApiResponse.success("Product fetched successfully by Category", responseDtos));
     }
+
+    @GetMapping("/subcategory/{subCategoryId}")
+    public ResponseEntity<ApiResponse<List<ProductResponseDto>>> getProductBySubCategory(@PathVariable("subCategoryId") Long subCategoryId){
+        List<ProductResponseDto> responseDtos = productService.getProductBySubCategoryId(subCategoryId);
+
+        return ResponseEntity.ok(ApiResponse.success("Product fetched successfully by Subcategory", responseDtos));
+    }
+
+    @GetMapping("/search")
+    public ResponseEntity<ApiResponse<List<ProductResponseDto>>> searchProducts(@RequestParam String keyword){
+        List<ProductResponseDto> responseDtos = productService.searchProducts(keyword);
+        return ResponseEntity.ok(ApiResponse.success("Product fetched successfully", responseDtos));
+    }
+    
 
 
 

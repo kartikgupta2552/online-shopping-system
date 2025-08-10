@@ -40,7 +40,7 @@ function MyNavbar() {
       const categoryData = await categoryApi.getAllCategories();
       setCategories(categoryData.data.data || []);
     } catch (error) {
-      console.log("Error fetching data:", error);
+      console.log("Error fetching category data:", error);
     }
   };
 
@@ -81,7 +81,7 @@ function MyNavbar() {
             <li className="nav-item dropdown">
               <a
                 className="nav-link dropdown-toggle"
-                href="#"
+                // href="#"
                 role="button"
                 data-bs-toggle="dropdown"
                 aria-expanded="false"
@@ -94,7 +94,7 @@ function MyNavbar() {
                     <Link
                       className="dropdown-item"
                       to={`/category/${cat.categoryName}`}
-                      state={{categoryId : cat.categoryId}}
+                      state={{ categoryId: cat.categoryId }}
                     >
                       {cat.categoryName}
                     </Link>
@@ -112,12 +112,12 @@ function MyNavbar() {
             </li>
           </ul>
           <form
-            className="d-flex"
+            className="d-flex mb-2"
             role="search"
             onSubmit={(e) => {
               e.preventDefault();
               if (search.trim()) {
-                navigate(`/search?q=${encodeURIComponent(search.trim())}`);
+                navigate(`/search?keyword=${encodeURIComponent(search.trim())}`);
               }
             }}
           >
@@ -166,7 +166,7 @@ function MyNavbar() {
               </>
             ) : (
               <>
-                <li className="nav-item">
+                <li className="nav-item mb-2">
                   <Link
                     className="btn btn-outline-primary btn-sm me-2 m-auto"
                     to="/login"

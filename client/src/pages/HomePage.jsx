@@ -2,12 +2,9 @@ import React, { useEffect, useState } from "react";
 import MyNavbar from "../components/MyNavbar.jsx";
 import Product from "../components/Product.jsx";
 import Footer from "../components/Footer.jsx";
-import categories from "../dummy-data/Categories.js";
-import products from "../dummy-data/products.js";
 import { useLocation, useNavigate } from "react-router-dom";
 import categoryApi from "../api/categoryApi.js";
-// import categories from '../Dummy Data/Categories';
-import { getProductByCategoryId } from '../api/productApi';
+import productApi from '../api/productApi';
 
 function HomePage() {
   
@@ -65,7 +62,7 @@ function HomePage() {
 
         // it will start calling api's but do not wait for their completion, it will just return array of promises
         const productPromises = responseCategories.map((cat) =>
-          getProductByCategoryId(cat.categoryId)
+          productApi.getProductByCategoryId(cat.categoryId)
         )
 
         // here it will wait for all api calls to finish
