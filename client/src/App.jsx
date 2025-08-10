@@ -6,7 +6,7 @@ import Payment from "./pages/Payment";
 import Cart from "./pages/Cart";
 import "./App.css"
 
-// import WishList from "./pages/WishList";
+// import Profile from "./pages/Profile";
 
 import HomePage from "./pages/HomePage";
 import CategoryPage from "./pages/CategoryPage";
@@ -27,6 +27,7 @@ import Orders from "./admin/pages/Orders";
 import Categories from "./admin/pages/Categories";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import { CartProvider } from "./context/CartContext";
+import Profile from "./pages/Profile";
 
 import React, { useEffect } from "react";
 import { LoaderProvider, useLoader } from "./context/LoaderContext";
@@ -58,7 +59,7 @@ const router = createBrowserRouter([
 
   { path: "/login", element: <Login /> },
   { path: "/cart", element: <Cart /> },
-  // {path: "/wishList", element: <WishList />},
+  {path: "/profile", element: <Profile />},
 
   { path: "/itemDetailsPage", element: <ItemDetailsPage /> },
   { path: "/cart", element: <Cart /> },

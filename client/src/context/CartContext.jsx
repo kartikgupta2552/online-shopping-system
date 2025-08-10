@@ -7,28 +7,28 @@ export const CartProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
   const [wishlist, setWishlist] = useState([]);
 
-  // const addToCart = (product) => {
-  //   setCart((prev) => [...prev, product]);
-  // };
+  
   const addToCart = (item) => {
     // Prevent duplicates
     const alreadyInCart = cart.some((cartItem) => cartItem.id === item.id);
+    
     if (alreadyInCart) {
       alert("Item is already in the cart!");
       return;
     }
+    alert("Item successfully added in the cart!");
     setCart([...cart, item]);2
   }
 
-  // const addToWishlist = (product) => {
-  //   setWishlist((prev) => [...prev, product]);
-  // };
+  
   const addToWishlist = (product) => {
     const alreadyInWishlist = wishlist.some((wishItem) => wishItem.id === product.id);
+    
     if (alreadyInWishlist) {
       alert("Item is already in the wishlist!");
       return;
     }
+    alert("Move to wishList Successfully");
     setWishlist((prev) => [...prev, product]);
   };
   const removeFromCart = (id) => {

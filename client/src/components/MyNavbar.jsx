@@ -1,6 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+
+import Profile from "../pages/Profile";
+
 import categoryApi from "../api/categoryApi";
+
 
 // 🩸 MAIN REPAIR: Always get user from localStorage.
 function MyNavbar() {
@@ -63,12 +67,29 @@ function MyNavbar() {
     }
   }
 
+  const handleCart = () => {
+    navigate('/cart')
+  };
   return (
     <nav className="navbar navbar-expand-lg bg-body-tertiary">
       <div className="container-fluid">
-        <Link className="nav-link active" aria-current="page" to="/" replace>
-          <strong> 🛒 ApnaCart</strong>
+
+        
+          <Link
+                className="nav-link active"
+//                 to="#"
+                onClick={(e) => {
+                  e.preventDefault(); // stop navigation
+                  handleCart();
+                }}
+          >
+                  <strong>🛒 ApnaCart</strong>
+
+{/* //         <Link className="nav-link active" aria-current="page" to="/" replace>
+//           <strong> 🛒 ApnaCart</strong> */}
+
         </Link>
+
         <button
           className="navbar-toggler"
           type="button"
@@ -178,6 +199,7 @@ function MyNavbar() {
                     Login
                   </Link>
                 </li>
+               
                 <li className="nav-item">
                   <Link
                     className="btn btn-outline-primary btn-sm me-2 m-auto"
