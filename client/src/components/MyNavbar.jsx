@@ -51,13 +51,22 @@ function MyNavbar() {
     localStorage.removeItem("user");
     localStorage.setItem("isLoggedIn", "false"); // For any old code, set to false.
     setUser(null);
-    navigate("/login");
+    navigate("/" , {replace : true}); // replaces the current page
+    // // then force refresh to clear memory navigation history
+    window.history.pushState(null, "", "/");
+  }
+
+  function handleOnSearchSubmit(e){
+    e.preventDefault();
+    if (search.trim()) {
+      navigate(`/search?keyword=${encodeURIComponent(search.trim())}`, {replace: true});
+    }
   }
 
   return (
     <nav className="navbar navbar-expand-lg bg-body-tertiary">
       <div className="container-fluid">
-        <Link className="nav-link active" aria-current="page" to="/">
+        <Link className="nav-link active" aria-current="page" to="/" replace>
           <strong> 🛒 ApnaCart</strong>
         </Link>
         <button
@@ -74,20 +83,19 @@ function MyNavbar() {
         <div className="collapse navbar-collapse" id="navbarSupportedContent">
           <ul className="navbar-nav me-auto mb-2 mb-lg-0">
             <li className="nav-item">
-              <Link className="nav-link active" aria-current="page" to="/">
+              <Link className="nav-link active" aria-current="page" to="/" replace>
                 Home
               </Link>
             </li>
             <li className="nav-item dropdown">
-              <a
+              <button
                 className="nav-link dropdown-toggle"
-                // href="#"
                 role="button"
                 data-bs-toggle="dropdown"
                 aria-expanded="false"
               >
                 Categories
-              </a>
+              </button>
               <ul className="dropdown-menu">
                 {categories.map((cat) => (
                   <li key={cat.categoryId}>
@@ -95,6 +103,7 @@ function MyNavbar() {
                       className="dropdown-item"
                       to={`/category/${cat.categoryName}`}
                       state={{ categoryId: cat.categoryId }}
+                      replace
                     >
                       {cat.categoryName}
                     </Link>
@@ -106,12 +115,7 @@ function MyNavbar() {
           <form
             className="d-flex mb-2"
             role="search"
-            onSubmit={(e) => {
-              e.preventDefault();
-              if (search.trim()) {
-                navigate(`/search?keyword=${encodeURIComponent(search.trim())}`);
-              }
-            }}
+            onSubmit={handleOnSearchSubmit}
           >
             <input
               className="form-control me-2"

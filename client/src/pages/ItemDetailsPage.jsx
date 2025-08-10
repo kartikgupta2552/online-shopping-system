@@ -42,14 +42,14 @@ const ItemDetailsPage = () => {
   }
     
   return (
-    <>
+    <div className="page-container">
       {/* Navbar */}
      
      
       <MyNavbar/>
 
       {/* Product Details */}
-      <div className="container-fluid mb-5">
+      <div className="container-fluid mb-5 content-wrap">
         <div className="row mb-4">
           <div className="col-md-5">
             <img src={`${BASE_URL}${product.imagePath}`}alt="Product" className="img-fluid rounded shadow"  />
@@ -96,7 +96,7 @@ const ItemDetailsPage = () => {
           <a href="#" className="text-muted">Contact Us</a>
         </div>
       </footer>
-    </>
+    </div>
   );
 };
 

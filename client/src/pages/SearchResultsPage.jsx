@@ -15,7 +15,7 @@ function SearchResultsPage() {
 
   useEffect(() => {
     fetchProduct()
-  }, [])
+  }, [keyword])
 
   const fetchProduct = async () => {
     try{
@@ -28,9 +28,9 @@ function SearchResultsPage() {
   }
 
   return (
-    <>
+    <div className="page-container">
       <MyNavbar />
-      <div className="container my-4">
+      <div className="container my-4 content-wrap">
         <h2>Search Results for "{keyword || "..."}"</h2>
         <div className="row">
           {products.length ? (
@@ -54,7 +54,7 @@ function SearchResultsPage() {
         </div>
       </div>
       <Footer />
-    </>
+    </div>
   );
 }
 

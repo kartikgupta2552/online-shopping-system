@@ -34,3 +34,13 @@
     flex-direction: column;
     height: 100%;
 }
+
+.page-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* full height of viewport */
+}
+
+.content-wrap {
+  flex: 1; /* pushes footer down */
+}
