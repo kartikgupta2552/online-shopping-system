@@ -17,13 +17,14 @@ import AddIcon from "@mui/icons-material/Add";
 import userApi from "../../api/userApi";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
+import { format } from "date-fns";
 
 const deleteUserApi = async (userId, token) => {
-  return userApi.delete(userId, token);
+  return userApi.deleteUser(userId, token);
 };
 
 const updateUserApi = async (userId, updateData, token) => {
-  return userApi.update(userId, updateData, token);
+  return userApi.updateUser(userId, updateData, token);
 };
 
 const Users = () => {
@@ -229,6 +230,7 @@ const Users = () => {
       const token = localStorage.getItem("token");
       const res = await userApi.getAllUsers(token);
       setRows(res.data.data);
+      console.log("Fetched users:", res.data.data);
       setLoading(false);
     } catch (err) {
       console.error("Failed to fetch users:", err);
@@ -414,6 +416,21 @@ const Users = () => {
 
               const token = localStorage.getItem("token");
               try {
+                //only send PATCH for fields that were actually changed(admin fn)
+                if (editUserFields.role !== selectedUser.role) {
+                  await userApi.changeRole(
+                    selectedUser.userId,
+                    editUserFields.role,
+                    token
+                  );
+                }
+                if (editUserFields.status !== selectedUser.status) {
+                  await userApi.changeStatus(
+                    selectedUser.userId,
+                    editUserFields.status,
+                    token
+                  );
+                }
                 await updateUserApi(
                   selectedUser.userId,
                   {

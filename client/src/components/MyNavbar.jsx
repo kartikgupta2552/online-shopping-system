@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { getAllCategories } from "../api/categoryApi";
+import categoryApi from "../api/categoryApi";
 
 // 🩸 MAIN REPAIR: Always get user from localStorage.
 function MyNavbar() {
@@ -37,8 +37,8 @@ function MyNavbar() {
 
   const fetchCategoryData = async () => {
     try {
-      const categoryData = await getAllCategories();
-      setCategories(categoryData.data);
+      const categoryData = await categoryApi.getAllCategories();
+      setCategories(categoryData.data.data || []);
     } catch (error) {
       console.log("Error fetching data:", error);
     }

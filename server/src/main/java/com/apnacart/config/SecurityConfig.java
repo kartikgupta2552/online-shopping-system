@@ -42,7 +42,7 @@ public class SecurityConfig {
                         //login and registration
 
 
-                        .requestMatchers("**").permitAll() // need to remove
+//                        .requestMatchers("**").permitAll() // need to remove
 
 
                         

@@ -21,7 +21,7 @@ const userApi = {
     },
 
     //update user profile
-    update: async (userId, userData, token) => {
+    updateUser: async (userId, userData, token) => {
         return axios.put
             (`${BASE_URL}/api/users/${userId}/profile`,
                 userData,
@@ -31,10 +31,32 @@ const userApi = {
     },
 
     //delete user(admin)
-    delete: async (userId, token) => {
+    deleteUser: async (userId, token) => {
         return axios.delete(`${BASE_URL}/api/users/${userId}/hard-delete`, {
             headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
+    },
+
+    //change user role
+    changeRole: async (userId, role, token) => {
+        return axios.patch(
+            `${BASE_URL}/api/users/${userId}/role?role=${role}`,
+            { }, //empty body
+            {
+                headers: token ? { Authorization: `Bearer ${token}` } : {},
+            }
+        );
+    },
+
+    //change user status
+    changeStatus: async (userId, status, token) => {
+        return axios.patch(
+            `${BASE_URL}/api/users/${userId}/status?status=${status}`,
+            { }, //empty body
+            {
+                headers: token ? { Authorization: `Bearer ${token}` } : {},
+            }
+        );
     },
 
 };

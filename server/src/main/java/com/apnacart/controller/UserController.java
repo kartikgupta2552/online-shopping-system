@@ -5,8 +5,10 @@ import java.util.List;
 import com.apnacart.dto.request.PasswordChangeDto;
 import com.apnacart.entity.UserRole;
 import com.apnacart.exception.UserAlreadyExistsException;
+import com.apnacart.security.CustomPrincipal;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -264,6 +266,16 @@ public class UserController {
 			@PathVariable Long userId,
 			@RequestParam UserStatus status
 			){
+        //fetch current authenticated admin from the security context
+        Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if(principal instanceof CustomPrincipal){
+            Long currentUserId = ((CustomPrincipal) principal).getUserId();
+            //check if the current admin is blocking themselves!(if yes then error)
+            if(currentUserId.equals(userId) && status == UserStatus.BLOCKED){
+                throw new IllegalArgumentException("Admins cannot block themselves!!");
+            }
+        }
+
 		UserResponseDto user = userService.changeUserStatus(userId, status);
 		ApiResponse<UserResponseDto> response = ApiResponse.success("User status updated successfully", user);
 		return ResponseEntity.ok(response);

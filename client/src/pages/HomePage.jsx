@@ -5,7 +5,7 @@ import Footer from "../components/Footer.jsx";
 import categories from "../dummy-data/Categories.js";
 import products from "../dummy-data/products.js";
 import { useLocation, useNavigate } from "react-router-dom";
-import { getAllCategories } from "../api/categoryApi.js";
+import categoryApi from "../api/categoryApi.js";
 // import categories from '../Dummy Data/Categories';
 import { getProductByCategoryId } from '../api/productApi';
 
@@ -59,8 +59,8 @@ function HomePage() {
 
   const fetchData = async () => {
       try{
-        const categoryData = await getAllCategories()
-        const responseCategories = categoryData.data
+        const categoryData = await categoryApi.getAllCategories()
+        const responseCategories = categoryData.data.data || []
         setCategories(responseCategories)
 
         // it will start calling api's but do not wait for their completion, it will just return array of promises
