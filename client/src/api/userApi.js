@@ -60,6 +60,13 @@ const userApi = {
         );
     },
 
+    // Get user profile
+    getUserProfile: async (userId, token) => {
+        return axiosInstance.get(`${BASE_URL}/api/users/${userId}/profile`, {
+            headers: token ? { Authorization: `Bearer ${token}` } : {},
+        });
+    },
+
 };
 
 export default userApi;
