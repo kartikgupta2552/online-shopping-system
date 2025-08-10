@@ -2,11 +2,28 @@
     width: 100%;               /* Responsive column sizing */
     min-width: 250px;          /* Prevents cards from shrinking too much */
     max-width: 300px;          /* All cards, max same size */
-    min-height: 430px;         /* All cards height identical (experiment as needed) */
+    /*min-height: 350px;*/         /* All cards height identical (experiment as needed) */
     display: flex;
     flex-direction: column;
     justify-content: space-between;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
+
+.product-card.compact {
+  width: 180px;
+  font-size: 0.9rem;
+}
+
+.product-card.compact img {
+  border-radius: 6px;
+}
+
+.product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-color: #007bff; /* Optional: border highlight color */
+}
+
 .product-card-img {
     height: 180px;
     object-fit: cover;         /* Crop/stretch images to fill area */
@@ -16,4 +33,14 @@
     display: flex;
     flex-direction: column;
     height: 100%;
+}
+
+.page-container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh; /* full height of viewport */
+}
+
+.content-wrap {
+  flex: 1; /* pushes footer down */
 }

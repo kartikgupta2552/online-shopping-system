@@ -4,6 +4,7 @@ import Register from "./pages/Register";
 import ItemDetailsPage from "./pages/ItemDetailsPage";
 import Payment from "./pages/Payment";
 import Cart from "./pages/Cart";
+import "./App.css"
 
 // import Profile from "./pages/Profile";
 
@@ -27,6 +28,10 @@ import Categories from "./admin/pages/Categories";
 import "bootstrap-icons/font/bootstrap-icons.css";
 import { CartProvider } from "./context/CartContext";
 import Profile from "./pages/Profile";
+
+import React, { useEffect } from "react";
+import { LoaderProvider, useLoader } from "./context/LoaderContext";
+import { loaderControl } from "./api/loaderControl";
 
 const router = createBrowserRouter([
   { path: "/", element: <HomePage /> },
@@ -66,13 +71,24 @@ const router = createBrowserRouter([
   { path: "/invoicePage", element: <InvoicePage /> },
 ]);
 
+function LoaderConnector() {
+  const { setLoading } = useLoader();
+
+  useEffect(() => {
+    loaderControl.register(setLoading);
+  }, []);
+
+  return null;
+}
+
 const App = () => {
   return (
-    <div>
+    <LoaderProvider>
+      <LoaderConnector />
       <CartProvider>
         <RouterProvider router={router} />
       </CartProvider>
-    </div>
+    </LoaderProvider>
   );
 };
 
