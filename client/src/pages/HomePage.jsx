@@ -54,7 +54,7 @@ function HomePage() {
   const fetchData = async () => {
     try {
       const categoryData = await categoryApi.getAllCategories();
-      const responseCategories = categoryData.data;
+      const responseCategories = categoryData.data.data || [];
       setCategories(responseCategories);
 
       // it will start calling api's but do not wait for their completion, it will just return array of promises
@@ -72,7 +72,7 @@ function HomePage() {
       // console.log(productMap)
       setProductsByCategory(productMap);
     } catch (error) {
-      console.log("Error fetching data:", error);
+      console.log("Error fetching ", error);
     }
   };
 

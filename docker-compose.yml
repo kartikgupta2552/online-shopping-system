@@ -1,0 +1,60 @@
+services:
+  mysql:
+    image: mysql:8.4
+    container_name: apnacart-mysql
+    restart: unless-stopped
+    environment:
+      MYSQL_ROOT_PASSWORD: Manager@123
+      MYSQL_DATABASE: apnacart
+     #MYSQL_USER: root
+     #MYSQL_PASSWORD: Manager@123
+    ports:
+      - "3306:3306"
+ #   volumes:
+ #     - mysql_/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    networks:
+      - apnacart-net
+
+  backend:
+    build:
+      context: ./server
+    container_name: apnacart-backend
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://mysql:3306/apnacart?createDatabaseIfNotExist=true&useSSL=false&allowPublicKeyRetrieval=true
+      SPRING_DATASOURCE_USERNAME: root
+      SPRING_DATASOURCE_PASSWORD: Manager@123
+#    volumes:
+#      - backend_uploads:/app/uploads
+    depends_on:
+      mysql:
+        condition: service_healthy
+    networks:
+      - apnacart-net
+
+  frontend:
+    build:
+      context: ./client
+    container_name: apnacart-frontend
+    restart: unless-stopped
+    ports:
+      - "5173:80"
+    depends_on:
+      - backend
+    networks:
+      - apnacart-net
+#  volumes:
+#    mysql_
+#    backend_uploads:
+
+networks:
+  apnacart-net:
+    driver: bridge
+

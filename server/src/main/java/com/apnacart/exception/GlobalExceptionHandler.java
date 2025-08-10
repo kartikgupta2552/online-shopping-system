@@ -3,6 +3,7 @@ package com.apnacart.exception;
 import java.util.HashMap;
 import java.util.Map;
 
+import io.jsonwebtoken.io.IOException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.FieldError;
@@ -11,8 +12,6 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
 
 import com.apnacart.payload.ApiResponse;
-
-import io.jsonwebtoken.io.IOException;
 
 @RestControllerAdvice 
 //Any exceptions thrown in the REST controllers will be intercepted globally by this class
@@ -134,8 +133,8 @@ public class GlobalExceptionHandler {
 	@ExceptionHandler(IOException.class)
 	public ResponseEntity<ApiResponse<Void>> handleIOException(IOException ex){
 		return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(ApiResponse.error("File operation failed", ex.getMessage()));
-	}
-	
+	}//handleIOException() ends
+
 	//handle all other runtime exceptions
 	@ExceptionHandler(RuntimeException.class)
 	public ResponseEntity<ApiResponse<Void>> handleRuntimeException(RuntimeException ex){

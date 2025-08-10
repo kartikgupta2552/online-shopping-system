@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
-import {
-  DataGrid
-} from "@mui/x-data-grid";
+import { DataGrid } from "@mui/x-data-grid";
 import {
   Box,
   Button,
@@ -12,18 +10,18 @@ import {
   DialogActions,
   IconButton,
   TextField,
-  MenuItem
+  MenuItem,
 } from "@mui/material";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
-
-const API = "http://localhost:8080"; // Adjust this if your API is on a different port
+import productApi from "../../api/productApi";
+import subcategoryApi from "../../api/subcategoryApi";
 
 const Products = () => {
   const [rows, setRows] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [categories, setCategories] = useState([]);
+  const [subCategories, setSubCategories] = useState([]);
   const [dialogOpen, setDialogOpen] = useState(false);
   const [dialogMode, setDialogMode] = useState("add"); // or "edit"
   const [selectedProduct, setSelectedProduct] = useState(null);
@@ -33,44 +31,54 @@ const Products = () => {
     description: "",
     price: "",
     quantity: "",
-    subCategoryId: "",
+    subCategoryId: "", 
   };
   const [form, setForm] = useState(emptyForm);
   const [formErrors, setFormErrors] = useState({});
 
-  // 🧠 Fetch categories (needed for subCategory dropdown)
+  // 🧠 Fetch subcategories (needed for subCategory dropdown)
   useEffect(() => {
-    const fetchCategories = async () => {
+    const fetchSubCategories = async () => {
       try {
-        // Use a GET endpoint to fetch categories & subcategories.
-        const token = localStorage.getItem("token");
-        const res = await axios.get(`${API}/subcategory`, {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        });
-        setCategories(res.data.data); // adjust if shape is different!
+        const res = await subcategoryApi.getAllSubcategories();
+        console.log("Fetched subcategories:", res.data.data);
+        setSubCategories(res.data.data);
       } catch (e) {
-        setCategories([]);
+        setSubCategories([]);
       }
     };
-    fetchCategories();
+    fetchSubCategories();
   }, []);
 
-  // 🧠 Fetch all products
+  //
+  // Fetch all products after subCategories is loaded!
   useEffect(() => {
     const fetchProducts = async () => {
       setLoading(true);
       try {
-        const res = await axios.get(`${API}/product`);
-        setRows(res.data.data || []);
+        const res = await productApi.getAllProducts();
+        // Map subcategory name *now* that subCategories is loaded!
+        const products = (res.data || []).map((product) => {
+          const subCat = subCategories.find(
+            (s) => String(s.subCategoryId) === String(product.subCategoryId)
+          );
+          // Only change: set subCategoryName properly!
+          return {
+            ...product,
+            subCategoryName: subCat ? subCat.subCategoryName : "Unknown",
+          };
+        });
+        setRows(products);
       } catch (e) {
         setRows([]);
       }
       setLoading(false);
     };
-    fetchProducts();
-  }, []);
+    if (subCategories.length > 0) fetchProducts();
+  }, [subCategories]); //Now depends on subCategories!
 
-  // 🚦 Validate product fields
+
+  // Validate product fields
   const validateForm = (values) => {
     const errors = {};
     if (!values.productName || values.productName.length < 3)
@@ -83,22 +91,25 @@ const Products = () => {
       Number(values.quantity) < 0
     )
       errors.quantity = "Non-negative quantity required.";
-    if (!values.subCategoryId)
-      errors.subCategoryId = "Sub-category required.";
+    if (!values.subCategoryId) errors.subCategoryId = "Sub-category required.";
     return errors;
   };
 
-  // 🟢 Add/Edit modal logic
+  // Add/Edit modal logic
   const handleDialogOpen = (mode, product = null) => {
     setDialogMode(mode);
     setSelectedProduct(product);
-    setForm(product ? {
-      productName: product.productName,
-      description: product.description || "",
-      price: product.price,
-      quantity: product.quantity,
-      subCategoryId: product.subCategoryId || "",
-    } : emptyForm);
+    setForm(
+      product
+        ? {
+            productName: product.productName,
+            description: product.description || "",
+            price: product.price,
+            quantity: product.quantity,
+            subCategoryId: product.subCategoryId || "", // don't use subCategoryName here!
+          }
+        : emptyForm
+    );
     setFormErrors({});
     setDialogOpen(true);
   };
@@ -110,7 +121,7 @@ const Products = () => {
     setFormErrors({});
   };
 
-  // 🔥 CREATE or UPDATE
+  // CREATE or UPDATE
   const handleDialogSubmit = async () => {
     let errors = validateForm(form);
     setFormErrors(errors);
@@ -118,22 +129,25 @@ const Products = () => {
     const token = localStorage.getItem("token");
     try {
       if (dialogMode === "add") {
-        await axios.post(
-          `${API}/product`,
-          form,
-          { headers: token ? { Authorization: `Bearer ${token}` } : {} }
-        );
+        productApi.addProduct(form);
       } else if (dialogMode === "edit" && selectedProduct) {
-        await axios.put(
-          `${API}/product/${selectedProduct.productId}`,
-          form,
-          { headers: token ? { Authorization: `Bearer ${token}` } : {} }
-        );
+        await productApi.updateProduct(selectedProduct.productId, form);
       }
+
       handleDialogClose();
       // Refetch products!
-      const res = await axios.get(`${API}/product`);
-      setRows(res.data.data || []);
+      const res = await productApi.getAllProducts();
+      // Map with subcategory names!
+      const products = (res.data || []).map((product) => {
+        const subCat = subCategories.find(
+          (s) => String(s.subCategoryId) === String(product.subCategoryId)
+        );
+        return {
+          ...product,
+          subCategoryName: subCat ? subCat.subCategoryName : "Unknown",
+        };
+      });
+      setRows(products);
     } catch (e) {
       alert("Failed! " + (e.response?.data?.message || e.message));
     }
@@ -142,35 +156,38 @@ const Products = () => {
   // 🧹 Delete product
   const handleDelete = async (productId) => {
     if (!window.confirm("Really delete this product (no undo!)?")) return;
-    const token = localStorage.getItem("token");
     try {
-      await axios.delete(`${API}/product/${productId}`, {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      });
+      productApi.deleteProduct(productId);
       setRows((r) => r.filter((row) => row.productId !== productId));
     } catch (e) {
       alert("Delete failed! " + (e.response?.data?.message || e.message));
     }
   };
 
-  // 🏓 The DataGrid columns
+  // The DataGrid columns
   const columns = [
     { field: "productId", headerName: "ID", minWidth: 60 },
     { field: "productName", headerName: "Name", minWidth: 130, flex: 1 },
     { field: "description", headerName: "Description", minWidth: 160, flex: 1 },
     { field: "price", headerName: "Price", minWidth: 85 },
     { field: "quantity", headerName: "Qty", minWidth: 60 },
-    { field: "subCategoryId", headerName: "SubCat", minWidth: 80 },
+    { field: "subCategoryName", headerName: "Sub Category", minWidth: 80 }, // ✅ subCategoryName used here!
     {
       field: "actions",
       headerName: "Actions",
       minWidth: 160,
       renderCell: (params) => (
         <>
-          <IconButton color="primary" onClick={() => handleDialogOpen("edit", params.row)}>
+          <IconButton
+            color="primary"
+            onClick={() => handleDialogOpen("edit", params.row)}
+          >
             <EditIcon />
           </IconButton>
-          <IconButton color="error" onClick={() => handleDelete(params.row.productId)}>
+          <IconButton
+            color="error"
+            onClick={() => handleDelete(params.row.productId)}
+          >
             <DeleteIcon />
           </IconButton>
         </>
@@ -239,9 +256,7 @@ const Products = () => {
             value={form.price}
             error={!!formErrors.price}
             helperText={formErrors.price}
-            onChange={(e) =>
-              setForm((f) => ({ ...f, price: e.target.value }))
-            }
+            onChange={(e) => setForm((f) => ({ ...f, price: e.target.value }))}
           />
           <TextField
             margin="dense"
@@ -267,16 +282,20 @@ const Products = () => {
               setForm((f) => ({ ...f, subCategoryId: e.target.value }))
             }
           >
-            {categories.map((cat) => (
+            {subCategories.map((cat) => (
               <MenuItem key={cat.subCategoryId} value={cat.subCategoryId}>
-                {cat.name}
+                {cat.subCategoryName}
               </MenuItem>
             ))}
           </TextField>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleDialogClose}>Cancel</Button>
-          <Button color="primary" variant="contained" onClick={handleDialogSubmit}>
+          <Button
+            color="primary"
+            variant="contained"
+            onClick={handleDialogSubmit}
+          >
             {dialogMode === "add" ? "Add" : "Save"}
           </Button>
         </DialogActions>

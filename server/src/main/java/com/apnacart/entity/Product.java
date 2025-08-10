@@ -21,11 +21,11 @@ import lombok.Setter;
 @Getter
 @NoArgsConstructor
 // same subcategory can't have duplicate product names
-@Table(uniqueConstraints = { 
-    @UniqueConstraint(columnNames = {"product_name", "sub_category_id"})
+@Table(uniqueConstraints = {
+        @UniqueConstraint(columnNames = {"product_name", "sub_category_id"})
 })
 public class Product {
-    
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long productId;
@@ -52,4 +52,4 @@ public class Product {
     @JsonBackReference
     private SubCategory subCategory;
 
-}
+}//Product class ends

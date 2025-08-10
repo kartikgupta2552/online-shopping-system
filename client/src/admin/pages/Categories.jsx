@@ -15,8 +15,8 @@ import { DataGrid } from "@mui/x-data-grid";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteIcon from "@mui/icons-material/Delete";
 import AddIcon from "@mui/icons-material/Add";
-
-const API = "http://localhost:8080";
+import categoryApi from "../../api/categoryApi";
+import subcategoryApi from "../../api/subcategoryApi";
 
 const Categories = () => {
   // --- Data State ---
@@ -38,16 +38,22 @@ const Categories = () => {
   const fetchCats = async () => {
     const token = localStorage.getItem("token");
     try {
-      const catRes = await axios.get(`${API}/category`, {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      });
-      setCategories(catRes.data.data || []);
-      console.log(catRes.data.data);
-      const subRes = await axios.get(`${API}/subcategory`, {
-        headers: token ? { Authorization: `Bearer ${token}` } : {},
-      });
-      setSubCategories(subRes.data.data || []);
-      console.log(subRes.data.data);
+      const catRes = await categoryApi.getAllCategories();
+      console.log(catRes);
+      const cats = (catRes.data.data || []).map((cat) => ({
+        ...cat,
+        name: cat.categoryName, // this is done because datagrid expects a 'name' field
+      }));
+      setCategories(cats);
+      console.log(cats);
+      const subRes = await subcategoryApi.getAllSubcategories();
+      console.log(subRes);
+      const subs = (subRes.data.data || []).map((sub) => ({
+        ...sub,
+        name: sub.subCategoryName, // this is done because datagrid expects a 'name' field
+      }));
+      setSubCategories(subs);
+      console.log(subs);
     } catch (e) {
       setCategories([]);
       setSubCategories([]);
@@ -71,7 +77,9 @@ const Categories = () => {
             name: row.name || "",
             categoryId:
               mode === "subcategory"
-                ? (row.categoryId ? String(row.categoryId) : "")
+                ? row.categoryId
+                  ? String(row.categoryId)
+                  : ""
                 : "",
           }
         : { name: "", categoryId: "" }
@@ -110,32 +118,24 @@ const Categories = () => {
       if (editMode) {
         // Edit logic: ONLY send name/categoryId if necessary!
         if (dialogMode === "category") {
-          await axios.put(
-            `${API}/category/${selected.categoryId}`,
-            { name: form.name }, // Only the name!
-            { headers: token ? { Authorization: `Bearer ${token}` } : {} }
-          );
+          await categoryApi.updateCategory(selected.categoryId, {
+            categoryName: form.name,
+          });
         } else {
-          await axios.put(
-            `${API}/subcategory/${selected.subCategoryId}`,
-            { name: form.name, categoryId: Number(form.categoryId) }, // Both fields for subcat update
-            { headers: token ? { Authorization: `Bearer ${token}` } : {} }
-          );
+          await subcategoryApi.updateSubcategory(selected.subCategoryId, {
+            subCategoryName: form.name,
+            categoryId: Number(form.categoryId),
+          });
         }
       } else {
         // Add logic
         if (dialogMode === "category") {
-          await axios.post(
-            `${API}/category`,
-            { name: form.name }, // Only name!
-            { headers: token ? { Authorization: `Bearer ${token}` } : {} }
-          );
+          await categoryApi.createCategory({ categoryName: form.name });
         } else {
-          await axios.post(
-            `${API}/subcategory`,
-            { name: form.name, categoryId: Number(form.categoryId) },
-            { headers: token ? { Authorization: `Bearer ${token}` } : {} }
-          );
+          await subcategoryApi.createSubcategory({
+            subCategoryName: form.name,
+            categoryId: Number(form.categoryId),
+          });
         }
       }
       handleDialogClose();
@@ -149,19 +149,24 @@ const Categories = () => {
 
   // --- Delete logic ---
   const handleDelete = async (row, mode) => {
-    if (!window.confirm(`Really delete ${row.name}? No undo!`)) return;
-    const token = localStorage.getItem("token");
+    console.log("delete clicked for : ", mode, row);
+    if (
+      !window.confirm(
+        `Do you really want to delete ${row.name}? You can't undo this operation!`
+      )
+    )
+      return;
     try {
-      await axios.delete(
-        mode === "category"
-          ? `${API}/category/${row.categoryId}`
-          : `${API}/subcategory/${row.subCategoryId}`,
-        {
-          headers: token ? { Authorization: `Bearer ${token}` } : {},
-        }
-      );
+      if (mode === "category") {
+        console.log("Deleting category:", row.categoryId);
+        await categoryApi.deleteCategory(row.categoryId);
+      } else {
+        console.log("Deleting subcategory:", row.subCategoryId);
+        await subcategoryApi.deleteSubcategory(row.subCategoryId);
+      }
       fetchCats();
     } catch (err) {
+      console.error("Delete failed:", err);
       alert("Delete failed: " + (err.response?.data?.message || err.message));
     }
   };
@@ -222,11 +227,7 @@ const Categories = () => {
   // --- Render ---
   return (
     <Box sx={{ width: "100%", p: 2 }}>
-      <Box
-        display="flex"
-        alignItems="center"
-        justifyContent="space-between"
-      >
+      <Box display="flex" alignItems="center" justifyContent="space-between">
         <h2 style={{ margin: 0 }}>Categories</h2>
         <div>
           <Button
@@ -289,9 +290,7 @@ const Categories = () => {
             value={form.name || ""}
             error={!!formErrors.name}
             helperText={formErrors.name}
-            onChange={(e) =>
-              setForm((f) => ({ ...f, name: e.target.value }))
-            }
+            onChange={(e) => setForm((f) => ({ ...f, name: e.target.value }))}
             fullWidth
           />
           {dialogMode === "subcategory" && (

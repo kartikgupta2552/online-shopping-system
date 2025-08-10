@@ -42,7 +42,7 @@ public class SecurityConfig {
                         //login and registration
 
 
-                        .requestMatchers("**").permitAll() // need to remove
+//                        .requestMatchers("**").permitAll() // need to remove
 
 
                         
@@ -53,6 +53,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.GET, "product/**").permitAll()
                         // Allow public images (optional)
                         .requestMatchers("/image/product/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/product", "/product/**").permitAll() // 👈 Allow GET to products for everyone
                         // --- Admin ONLY endpoints ---
                         .requestMatchers(
                                 HttpMethod.POST, "/category/**", "/subcategory/**"
@@ -65,13 +66,13 @@ public class SecurityConfig {
                         ).hasRole("ADMIN")
                         // User admin actions (patch role/status, user delete, get all users)
                         .requestMatchers(
-                                HttpMethod.PATCH, "/api/users/{\\d+}/status", "/api/users/{\\d+}/role"
+                                HttpMethod.PATCH, "/api/users/*/status", "/api/users/*/role"
                         ).hasRole("ADMIN")
                         .requestMatchers(
                                 HttpMethod.GET, "/api/users/all", "/api/users/status/**"
                         ).hasRole("ADMIN")
                         .requestMatchers(
-                                HttpMethod.DELETE, "/api/users/{\\d+}/soft-delete", "/api/users/{\\d+}/hard-delete"
+                                HttpMethod.DELETE, "/api/users/*/soft-delete", "/api/users/*/hard-delete"
                         ).hasRole("ADMIN")
                         .requestMatchers("/swagger-ui/**", "/v3/api-docs/**").permitAll() // swagger documentation
                         .requestMatchers("/error").permitAll() // error pages
@@ -79,7 +80,7 @@ public class SecurityConfig {
                         // --- User actions (require login) ---
                         .requestMatchers("/api/users/**").authenticated()
                         .requestMatchers("/api/orders/**").authenticated()
-                        .requestMatchers(HttpMethod.POST, "/api/products/**", "/api/orders/**").authenticated()
+                        .requestMatchers(HttpMethod.POST, "/api/orders/**").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/orders/**").authenticated()
                         .anyRequest().authenticated()
                 )

@@ -1,6 +1,6 @@
 package com.apnacart.entity;
 
-import java.util.List;
+
 
 import com.fasterxml.jackson.annotation.JsonBackReference;
 import com.fasterxml.jackson.annotation.JsonManagedReference;
@@ -14,10 +14,13 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 import lombok.ToString;
+
+import java.util.List;
 
 @Entity
 @Getter
@@ -34,11 +37,11 @@ public class SubCategory {
 	private String subCategoryName;
 	
 	@ManyToOne
-	@JoinColumn(name = "category_id" , nullable = false)
+	@JoinColumn(name = "category_id", nullable = false) //nullable - false because a subcategory shouldn't exist without a category
 	@JsonBackReference
 	private Category category;
 
-	@OneToMany(mappedBy = "subCategory", cascade = CascadeType.ALL)
-	@JsonManagedReference
+	@OneToMany(mappedBy = "subCategory", cascade = CascadeType.ALL,orphanRemoval = true)
 	private List<Product> products;
+
 }

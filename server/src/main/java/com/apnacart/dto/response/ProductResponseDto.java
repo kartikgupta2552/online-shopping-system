@@ -1,6 +1,5 @@
 package com.apnacart.dto.response;
 
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -22,4 +21,4 @@ public class ProductResponseDto {
 
     private String imagePath;
 
-}
+}//ProductResponseDto class ends

@@ -17,9 +17,11 @@
     "@mui/x-data-grid": "^8.9.2",
     "axios": "^1.11.0",
     "bootstrap-icons": "^1.13.1",
+    "date-fns": "^4.1.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
-    "react-router-dom": "^7.7.0"
+    "react-router-dom": "^7.7.0",
+    "recharts": "^3.1.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.30.1",

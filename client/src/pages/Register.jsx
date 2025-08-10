@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-
+import userApi from "../api/userApi";
 import { Link, useNavigate } from "react-router-dom";
 
 // Set your real registration API endpoint
@@ -82,33 +82,10 @@ const Register = () => {
         email: formData.email,
         password: formData.password,
         mobileNo: formData.mobile,
+        address: formData.address,
       };
 
-      const response = await fetch(API_URL, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      if (!response.ok) {
-        const errorRes = await response.json().catch(() => null);
-        if (
-          errorRes &&
-          errorRes.message &&
-          (errorRes.message.includes("exists") ||
-            errorRes.message.includes("already"))
-        ) {
-          setServerError(errorRes.message);
-        } else if (errorRes && errorRes.data) {
-          setErrors(errorRes.data);
-        } else {
-          setServerError(
-            "Registration failed. Please check your details and try again."
-          );
-        }
-        setLoading(false);
-        return;
-      }
+      await userApi.registerUser(payload);
 
       // Registration success, redirect to login
       setLoading(false);
@@ -116,7 +93,16 @@ const Register = () => {
       navigate("/login");
     } catch (err) {
       setLoading(false);
-      setServerError("Something went wrong. Please try again later.");
+      //axios error handling
+      if(err.response && err.response.data && err.response.data.message){
+        setServerError(err.response.data.message);
+      }
+      else if(err.response && err.response.data && err.respose.data.data){
+        setErrors(err.response.data.data)
+      }
+      else {
+        setServerError("Registration failed. Please check your details and try again.")
+      }
     }
   };
 

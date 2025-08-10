@@ -42,7 +42,7 @@ function MyNavbar() {
   const fetchCategoryData = async () => {
     try {
       const categoryData = await categoryApi.getAllCategories();
-      setCategories(categoryData.data);
+      setCategories(categoryData.data.data || []);
     } catch (error) {
       console.log("Error fetching category data:", error);
     }
@@ -130,6 +130,14 @@ function MyNavbar() {
                     </Link>
                   </li>
                 ))}
+                <li>
+                  <hr className="dropdown-divider" />
+                </li>
+                <li>
+                  <a className="dropdown-item" href="#">
+                    View All Categories
+                  </a>
+                </li>
               </ul>
             </li>
           </ul>

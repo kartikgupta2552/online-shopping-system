@@ -26,4 +26,4 @@ public interface ProductService {
 
     List<ProductResponseDto> searchProducts(String keyword);
 
-}
+}//ProductService interface ends

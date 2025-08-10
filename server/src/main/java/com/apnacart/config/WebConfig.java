@@ -5,8 +5,8 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
-import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 import org.springframework.web.servlet.config.annotation.ResourceHandlerRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
 
 @Configuration
@@ -18,7 +18,7 @@ public class WebConfig implements WebMvcConfigurer{
         registry.addResourceHandler("image/product/**")
             .addResourceLocations("file:uploads/images"); // absolute or relative path
     }
-  
+
     @Bean
     public WebMvcConfigurer corsConfigurer(){
         return new WebMvcConfigurer() {
@@ -49,5 +49,3 @@ public class WebConfig implements WebMvcConfigurer{
     }//corsConfigurer() ends
 
 }//WebConfig class ends
-
-

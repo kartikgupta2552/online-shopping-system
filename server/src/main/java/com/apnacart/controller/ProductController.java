@@ -1,6 +1,5 @@
 package com.apnacart.controller;
 
-
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
@@ -25,7 +24,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
-
+import org.springframework.web.bind.annotation.RequestParam;
 
 
 
@@ -39,9 +38,9 @@ public class ProductController {
 
     @PostMapping
     public ResponseEntity<ApiResponse<ProductResponseDto>> addProduct(
-        @RequestPart("product") @Valid ProductRequestDto dto,
-        @RequestPart(value = "image", required = false) MultipartFile imageFile
-        ) throws IOException {
+            @RequestPart("product") @Valid ProductRequestDto dto,
+            @RequestPart(value = "image", required = false) MultipartFile imageFile
+    ) throws IOException {
         ProductResponseDto responseDto = productService.createProduct(dto,imageFile);
         return new ResponseEntity<>(ApiResponse.success("Product added successfully", responseDto), HttpStatus.CREATED);
     }
@@ -85,11 +84,14 @@ public class ProductController {
 
         return ResponseEntity.ok(ApiResponse.success("Product fetched successfully by Subcategory", responseDtos));
     }
-    
-    @GetMapping("/search")   
+
+    @GetMapping("/search")
     public ResponseEntity<ApiResponse<List<ProductResponseDto>>> searchProducts(@RequestParam String keyword){
         List<ProductResponseDto> responseDtos = productService.searchProducts(keyword);
         return ResponseEntity.ok(ApiResponse.success("Product fetched successfully", responseDtos));
     }
     
+
+
+
 }

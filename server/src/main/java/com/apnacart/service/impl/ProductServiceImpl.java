@@ -1,6 +1,5 @@
 package com.apnacart.service.impl;
 
-
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -44,10 +43,10 @@ public class ProductServiceImpl implements ProductService{
         SubCategory subCategory = subCategoryDao.findById(dto.getSubCategoryId()).orElseThrow(() -> new ResourceNotFoundException("Subcategory not found with ID: " + dto.getSubCategoryId()));
 
         productDao.findByProductNameAndSubCategory_SubCategoryId(dto.getProductName(), dto.getSubCategoryId())
-            .ifPresent(product -> {
-                throw new ResourceAlreadyExistsException("Product already exist with name: " + dto.getProductName() 
-                    + " under " + product.getSubCategory().getSubCategoryName() + " subcategory");
-            });
+                .ifPresent(product -> {
+                    throw new ResourceAlreadyExistsException("Product already exist with name: " + dto.getProductName()
+                            + " under " + product.getSubCategory().getSubCategoryName() + " subcategory");
+                });
 
         Product product = modelMapper.map(dto, Product.class);
         product.setSubCategory(subCategory);
@@ -56,7 +55,7 @@ public class ProductServiceImpl implements ProductService{
             // saved image folder path
             String uploadDir = localImageFilePath;
             String originalFileName = imageFile.getOriginalFilename();
-            // Generating new name for file so that there is no name conflict 
+            // Generating new name for file so that there is no name conflict
             String fileNewName = UUID.randomUUID().toString() + "_" + originalFileName;
             // combining file with folder (eg. uploads/images/abc.png)
             // it is cross-platform safe(Windows,Mac,Linux) bcz windows use ("\") and Linux/macOS use ("/") it will handle that
@@ -73,13 +72,13 @@ public class ProductServiceImpl implements ProductService{
         Product createProduct = productDao.save(product);
         ProductResponseDto responseDto = modelMapper.map(createProduct, ProductResponseDto.class);
         responseDto.setSubCategoryId(createProduct.getSubCategory().getSubCategoryId());
-        
+
         return responseDto;
     }
 
     @Override
     public ProductResponseDto getProductById(Long productId) {
-        
+
         Product product = productDao.findById(productId).orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + productId));
         ProductResponseDto responseDto = modelMapper.map(product, ProductResponseDto.class);
         responseDto.setSubCategoryId(product.getSubCategory().getSubCategoryId());
@@ -89,7 +88,7 @@ public class ProductServiceImpl implements ProductService{
 
     @Override
     public List<ProductResponseDto> getAllProducts() {
-        
+
         List<Product> products = productDao.findAll();
         List<ProductResponseDto> responseDtoList = new ArrayList<>();
         products.forEach(product -> {
@@ -113,7 +112,7 @@ public class ProductServiceImpl implements ProductService{
         if(existingProduct.isPresent() && !existingProduct.get().getProductId().equals(productId)){
             throw new ResourceAlreadyExistsException("Product already exists with the same name under this SubCategory.");
         }
-        
+
         // Update product details
         product.setProductName(dto.getProductName());
         product.setDescription(dto.getDescription());
@@ -132,6 +131,7 @@ public class ProductServiceImpl implements ProductService{
             // save new image
             String fileName = UUID.randomUUID().toString() + "_" + imageFile.getOriginalFilename();
             Path newImagePath = Paths.get(localImageFilePath, fileName);
+            Files.createDirectories(newImagePath.getParent());
             Files.copy(imageFile.getInputStream(), newImagePath, StandardCopyOption.REPLACE_EXISTING);
 
             product.setImagePath(dbImagePath + fileName);
@@ -146,13 +146,13 @@ public class ProductServiceImpl implements ProductService{
 
     @Override
     public void deleteProduct(Long productId) throws IOException{
-        
-       Product product = productDao.findById(productId).orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + productId));
+
+        Product product = productDao.findById(productId).orElseThrow(() -> new ResourceNotFoundException("Product not found with ID: " + productId));
 
         if(product.getImagePath() != null){
-                // getting the image name of database and finding image in server by adding path of locally saved image
-                Path oldImagePath = Paths.get(localImageFilePath, Paths.get(product.getImagePath()).getFileName().toString());
-                Files.deleteIfExists(oldImagePath);
+            // getting the image name of database and finding image in server by adding path of locally saved image
+            Path oldImagePath = Paths.get(localImageFilePath, Paths.get(product.getImagePath()).getFileName().toString());
+            Files.deleteIfExists(oldImagePath);
         }
 
         productDao.deleteById(productId);
@@ -167,7 +167,7 @@ public class ProductServiceImpl implements ProductService{
             responseDto.setSubCategoryId(product.getSubCategory().getSubCategoryId());
             responseDtos.add(responseDto);
         });
-        
+
         return responseDtos;
     }
 
@@ -197,4 +197,4 @@ public class ProductServiceImpl implements ProductService{
         return responseDtos;
     }
 
-}
+}//ProductServiceImpl() ends
