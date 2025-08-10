@@ -85,8 +85,8 @@ function MyNavbar() {
           >
                   <strong>🛒 ApnaCart</strong>
 
-//         <Link className="nav-link active" aria-current="page" to="/" replace>
-//           <strong> 🛒 ApnaCart</strong>
+{/* //         <Link className="nav-link active" aria-current="page" to="/" replace>
+//           <strong> 🛒 ApnaCart</strong> */}
 
         </Link>
 
