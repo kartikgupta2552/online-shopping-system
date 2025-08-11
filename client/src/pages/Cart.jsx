@@ -3,7 +3,11 @@ import { useNavigate } from "react-router-dom";
 import MyNavbar from "../components/MyNavbar";
 import { CartContext } from "../context/CartContext";
 
+
+
 const Cart = () => {
+
+  const BASE_URL= import.meta.env.VITE_API_BASE_URL;
   const navigate = useNavigate();
 
   // 💉 All state/actions come from CartContext, not weird local arrays anymore.
@@ -55,7 +59,7 @@ const Cart = () => {
             <div className="col" key={item.id}>
               <div className="card h-100 shadow-sm">
                 <img
-                  src={item.image_path}
+                  src={`${BASE_URL}${item.image}`}
                   className="card-img-top"
                   alt={item.title}
                 />
@@ -113,7 +117,7 @@ const Cart = () => {
             <div className="col" key={item.id}>
               <div className="card h-100 shadow-sm">
                 <img
-                  src={item.image}
+                  src={`${BASE_URL}${item.image}`}
                   className="card-img-top"
                   alt={item.title}
                 />
