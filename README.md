@@ -295,11 +295,11 @@ volumes:
 
 This project is developed by a dedicated team of three developers:
 
-- **Tushar** - Full Stack Developer
+- **Tushar** 
     
-- **Kartik** - Backend Developer
+- **Kartik** 
     
-- **Akanksha** - Frontend Developer
+- **Akanksha**
     
 
 _Developed as part of Post Graduate Diploma in Advanced Computing (PG-DAC) program at CDAC._
